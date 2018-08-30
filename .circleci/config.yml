@@ -1,0 +1,55 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: hashicorp/terraform:0.11.8
+    steps:
+      - checkout:
+            path: ~/module
+      - run: mkdir -p ~/workspace
+      - run: cp -pr ~/module/.circleci/bin ~/bin
+      - run: mv ~/module/tests/ ~/layers/ # Move tests into layers directory
+      - run:
+          name: lint tests
+          command: cd ~ && ~/bin/lint.sh
+      - run:
+          name: prep examples
+          command: |
+            mkdir -p ~/example_lint/layers/
+            if [ -d ~/module/examples/ ]; then
+              echo "Moving examples directory"
+              mv ~/module/examples/ ~/example_lint/layers/ || echo "Cannot move examples directory"
+            fi
+            if [ -d ~/module/modules/ ]; then
+              SUBMODULES=$(find ~/module/modules/* -type d -maxdepth 0 -exec basename '{}' \; | sort -n)
+              for MODULE in $SUBMODULES; do
+                echo "Moving $MODULE examples directory"
+                mv ~/module/modules/$MODULE/examples/ ~/example_lint/layers/$MODULE/
+              done
+            fi
+      - run:
+          name: lint examples
+          command: cd ~/example_lint  && ~/bin/lint.sh
+      - run: mkdir -p ~/module_lint/layers/ && cp -pr ~/module/ ~/module_lint/layers/module/
+      - run:
+          name: lint module
+          command: cd ~/module_lint  && ~/bin/lint.sh
+      - run:
+          name: plan
+          command: cd ~ && ~/bin/plan.sh
+      - run:
+          name: apply
+          command: cd ~ && ~/bin/apply.sh
+      - run:
+          name: destroy
+          command: cd ~ && ~/bin/destroy.sh  # must succeed or we have something to clean up manually
+          when: always
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test:
+          filters:
+            branches:
+             ignore: master
