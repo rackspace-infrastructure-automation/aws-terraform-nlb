@@ -1,32 +1,3 @@
-locals {
-  default_tg_params = {
-    dereg_delay = 300
-    target_type = "instance"
-  }
-
-  default_health_check = {
-    protocol            = "TCP"
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-    interval            = 30
-  }
-
-  tg_keys = "${keys(var.nlb_tg_map)}"
-  lm_keys = "${keys(var.nlb_listener_map)}"
-  hc_keys = "${keys(var.nlb_hc_map)}"
-}
-
-# Determine NLB AWS Account ID for bucket policy: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy 
-data "aws_elb_service_account" "nlb_svc_acct" {}
-
-resource "random_id" "random_string" {
-  byte_length = 8
-
-  keepers {
-    name = "${var.nlb_name}"
-  }
-}
-
 resource "aws_lb" "nlb" {
   name               = "${var.nlb_name}"
   internal           = "${var.nlb_facing == "internal" ? true : false}"
@@ -107,46 +78,6 @@ resource "aws_lb_listener" "nlb_listener" {
   }
 }
 
-data "aws_network_interface" "nlb_eni" {
-  # this data source does not permit muliple results
-  count = "${var.nlb_eni_count}"
-
-  #count = "${length(var.nlb_subnet_ids)}"
-
-  filter {
-    name = "description"
-
-    values = [
-      "ELB net/${var.nlb_name}/*",
-    ]
-  }
-  filter {
-    name = "subnet-id"
-
-    values = [
-      "${element(var.nlb_subnet_ids,count.index)}",
-    ]
-  }
-  # terraform has no way of determining this dependency unaided
-  depends_on = ["aws_lb.nlb"]
-}
-
-data "aws_iam_policy_document" "nlb_log_bucket_policy" {
-  # only generate this policy if we are going to create the bucket
-  count = "${var.nlb_al_bucket == "__UNSET__" ? 1:0}"
-
-  statement {
-    actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::${var.nlb_name}-${var.environment}-${random_id.random_string.hex}-nlb-logs/AWSLogs/*"]
-    effect    = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["${data.aws_elb_service_account.nlb_svc_acct.arn}"]
-    }
-  }
-}
-
 resource "aws_s3_bucket" "nlb_log_bucket" {
   # should we create a bucket or use the one provided?
   count = "${var.nlb_al_bucket == "__UNSET__" ? 1:0}"
@@ -157,11 +88,6 @@ resource "aws_s3_bucket" "nlb_log_bucket" {
   policy = "${data.aws_iam_policy_document.nlb_log_bucket_policy.json}"
 }
 
-/*
-data "aws_route53_zone" "provided" {
-  count   = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
-  zone_id = "${var.route53_zone_id}"
-}
 
 resource "aws_route53_record" "route53_nlb_cname" {
   count = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
@@ -172,7 +98,7 @@ resource "aws_route53_record" "route53_nlb_cname" {
   type    = "CNAME"
   ttl     = "5"
 }
-*/
+
 /*
 resource "aws_cloudwatch_metric_alarm" "ni_lb_unhealthy_hosts" {
   actions_enabled = "${var.enable_cloudwatch_alarm_actions}"

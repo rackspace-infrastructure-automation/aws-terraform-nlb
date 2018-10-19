@@ -9,20 +9,18 @@ variable environment {
   default = "noenv"
 }
 
-/*
 # Route53: the zone_id in which to create our CNAME
 variable "route53_zone_id" {
   type    = "string"
   default = "__UNSET__"
 }
-*/
 
 # VPC: list of subnet ids (1 per AZ only) to attach to this NLB
 variable "nlb_subnet_ids" {
   type = "list"
 }
 
-# VPC: explicitly tell terraform how many to expect
+# VPC: explicitly tell terraform how many subnets to expect
 variable "nlb_eni_count" {
   default = "0"
 }
