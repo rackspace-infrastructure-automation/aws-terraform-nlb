@@ -136,6 +136,12 @@ variable "enable_cloudwatch_alarm_actions" {
 #      CloudWatch Monitoring for Target Groups
 #
 
+# CloudWatch: SNS topic for alarm actions
+variable "nlb_alarm_topic" {
+  type    = "string"
+  default = "rackspace-support-urgent"
+}
+
 # CloudWatch: alarm sample period in seconds
 variable "nlb_unhealthy_hosts_alarm_period" {
   type    = "string"

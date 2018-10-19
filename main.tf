@@ -15,22 +15,6 @@ resource "aws_lb" "nlb" {
     prefix  = "AWSLogs"
     enabled = true
   }
-
-  /*
-  # there is no graceful way to define a variable number of subnet mappings
-  see:
-  https://github.com/hashicorp/terraform/issues/7034
-  https://serverfault.com/questions/833810/terraform-use-nested-loops-with-count
-
-  subnet_mapping {
-    subnet_id     = "${var.subnet_public[0]}"
-    allocation_id = "eipalloc-54157069"
-  }
-  subnet_mapping {
-    subnet_id     = "${var.subnet_public[1]}"
-    allocation_id = "eipalloc-8d096cb0"
-  }
-  */
 }
 
 resource "aws_lb_target_group" "nlb_tg" {
@@ -93,7 +77,7 @@ resource "aws_cloudwatch_metric_alarm" "nlb_unhealthy_hosts" {
   actions_enabled = "${var.enable_cloudwatch_alarm_actions}"
 
   alarm_actions = [
-    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
+    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.nlb_alarm_topic}",
   ]
 
   alarm_description   = "Unhealthy Host count is above threshold, creating ticket."
@@ -117,5 +101,4 @@ resource "aws_cloudwatch_metric_alarm" "nlb_unhealthy_hosts" {
   statistic = "Average"
   threshold = "${var.nlb_unhealthy_hosts_alarm_threshold}"
   unit      = "Count"
-
 }
