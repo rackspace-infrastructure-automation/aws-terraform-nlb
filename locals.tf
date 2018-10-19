@@ -15,4 +15,3 @@ locals {
   lm_keys = "${keys(var.nlb_listener_map)}"
   hc_keys = "${keys(var.nlb_hc_map)}"
 }
-

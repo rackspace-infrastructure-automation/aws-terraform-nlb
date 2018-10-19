@@ -55,16 +55,6 @@ resource "aws_lb_target_group" "nlb_tg" {
   }
 }
 
-/*
-this does not belong here
-resource "aws_lb_target_group_attachment" "nlb_tg_attachment" {
-  count            = "${length(var.nlb_tg_instances)}"
-  target_group_arn = "${aws_lb_target_group.nlb_tg[count.index].arn}"
-  target_id        = "${element(module.ec2_ni.instance_id, count.index)}"
-  port             = 22
-}
-*/
-
 resource "aws_lb_listener" "nlb_listener" {
   count = "${length(local.lm_keys)}"
 
@@ -88,7 +78,6 @@ resource "aws_s3_bucket" "nlb_log_bucket" {
   policy = "${data.aws_iam_policy_document.nlb_log_bucket_policy.json}"
 }
 
-
 resource "aws_route53_record" "route53_nlb_cname" {
   count = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
 
@@ -99,41 +88,34 @@ resource "aws_route53_record" "route53_nlb_cname" {
   ttl     = "5"
 }
 
-/*
-resource "aws_cloudwatch_metric_alarm" "ni_lb_unhealthy_hosts" {
+resource "aws_cloudwatch_metric_alarm" "nlb_unhealthy_hosts" {
+  count           = "${length(local.tg_keys)}"
   actions_enabled = "${var.enable_cloudwatch_alarm_actions}"
-
 
   alarm_actions = [
     "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
   ]
 
-
   alarm_description   = "Unhealthy Host count is above threshold, creating ticket."
-  alarm_name          = "NLB Unhealthy Host Count - ${aws_lb.ni_lb.name}"
+  alarm_name          = "NLB Unhealthy Host Count - ${aws_lb.nlb.name}-${aws_lb_target_group.nlb_tg.*.name[count.index]}"
   comparison_operator = "GreaterThanThreshold"
 
-
   dimensions = {
-    LoadBalancer = "${aws_lb.ni_lb.arn_suffix}"
-    TargetGroup  = "${aws_lb_target_group.ni_lb_tg.arn_suffix}"
+    LoadBalancer = "${aws_lb.nlb.arn_suffix}"
+    TargetGroup  = "${aws_lb_target_group.nlb_tg.*.arn_suffix[count.index]}"
   }
 
-
-  evaluation_periods = "${var.lb_unhealthy_hosts_alarm_evaluation_periods}"
+  evaluation_periods = "${var.nlb_unhealthy_hosts_alarm_evaluation_periods}"
   metric_name        = "UnHealthyHostCount"
   namespace          = "AWS/NetworkELB"
-
 
   ok_actions = [
     "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
   ]
 
-
-  period    = "${var.lb_unhealthy_hosts_alarm_period}"
+  period    = "${var.nlb_unhealthy_hosts_alarm_period}"
   statistic = "Average"
-  threshold = "${var.lb_unhealthy_hosts_alarm_threshold}"
+  threshold = "${var.nlb_unhealthy_hosts_alarm_threshold}"
   unit      = "Count"
-}
-*/
 
+}

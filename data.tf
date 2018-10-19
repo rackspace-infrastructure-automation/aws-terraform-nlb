@@ -1,6 +1,10 @@
 # Determine NLB AWS Account ID for bucket policy: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy 
 data "aws_elb_service_account" "nlb_svc_acct" {}
 
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
 resource "random_id" "random_string" {
   byte_length = 8
 
@@ -22,6 +26,7 @@ data "aws_network_interface" "nlb_eni" {
       "ELB net/${var.nlb_name}/*",
     ]
   }
+
   filter {
     name = "subnet-id"
 
@@ -29,6 +34,7 @@ data "aws_network_interface" "nlb_eni" {
       "${element(var.nlb_subnet_ids,count.index)}",
     ]
   }
+
   # terraform has no way of determining this dependency unaided
   depends_on = ["aws_lb.nlb"]
 }
@@ -69,4 +75,3 @@ data "aws_route53_zone" "provided" {
   count   = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
   zone_id = "${var.route53_zone_id}"
 }
-
