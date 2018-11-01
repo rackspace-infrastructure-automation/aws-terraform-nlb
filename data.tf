@@ -55,22 +55,6 @@ data "aws_network_interfaces" "nlb_enis" {
 }
 */
 
-data "aws_iam_policy_document" "nlb_log_bucket_policy" {
-  # only generate this policy if we are going to create the bucket
-  count = "${var.nlb_al_bucket == "__UNSET__" ? 1:0}"
-
-  statement {
-    actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::${var.nlb_name}-${var.environment}-${random_id.random_string.hex}-nlb-logs/AWSLogs/*"]
-    effect    = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["${data.aws_elb_service_account.nlb_svc_acct.arn}"]
-    }
-  }
-}
-
 data "aws_route53_zone" "provided" {
   count   = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
   zone_id = "${var.route53_zone_id}"

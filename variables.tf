@@ -6,7 +6,7 @@ variable "nlb_name" {
 # Label: environment name e.g. dev; prod
 variable environment {
   type    = "string"
-  default = "noenv"
+  default = "test"
 }
 
 # Route53: the zone_id in which to create our CNAME
@@ -41,12 +41,7 @@ variable "nlb_subnet_map" {
 
 # NLB: is this load-balancer "internal" or "external"? 
 variable "nlb_facing" {
-  default = "internal"
-}
-
-# NLB: idle timeout in seconds, not currently valid for LB type "network"
-variable "nlb_idle_timeout" {
-  default = 60
+  default = "external"
 }
 
 # NLB: configure cross zone load balancing
@@ -58,19 +53,7 @@ variable "nlb_cross_zone" {
 variable "nlb_tags" {
   type = "map"
 
-  default = {
-    "nlb" = true
-  }
-}
-
-# S3: Access Logs Bucket
-variable "nlb_al_bucket" {
-  default = "__UNSET__"
-}
-
-# S3: A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable.
-variable "force_destroy_log_bucket" {
-  default = false
+  default = {}
 }
 
 /*  NLB: listener map
@@ -79,8 +62,7 @@ e.g.
 nlb_listener_map = {
   "0" = {
     "port"            = "80"
-    "protocol"        = "TCP"
-    "target_group"    = "${aws_lb_target_group.nlb_tg.arn}"
+    "target_group"    = "arn:aws:elasticloadbalancing:xxxxxxx" # optionally specify existing TG ARN
   }
 }
 */
@@ -96,7 +78,6 @@ nlb_tg_map  = {
   "listener1" = {
     "name"          = "listener1-tg-name"
     "port"          = "80"
-    "protocol"      = "HTTP"
     "dereg_delay"   = "300"
     "target_type"   = "instance"
   }
@@ -116,10 +97,12 @@ nlb_hc_map  = {
       interval            = "30"
     }
   "listener2" = {
-      protocol            = "TCP"
+      protocol            = "HTTP"
       healthy_threshold   = "3"
       unhealthy_threshold = "3"
       interval            = "30"
+      matcher             = "200-399"
+      path                = "/"
     }
 }
 */
@@ -139,7 +122,7 @@ variable "enable_cloudwatch_alarm_actions" {
 # CloudWatch: SNS topic for alarm actions
 variable "nlb_alarm_topic" {
   type    = "string"
-  default = "rackspace-support-urgent"
+  default = "rackspace-support-emergency"
 }
 
 # CloudWatch: alarm sample period in seconds
@@ -157,5 +140,5 @@ variable "nlb_unhealthy_hosts_alarm_threshold" {
 # CloudWatch: alarm sample count threhold
 variable "nlb_unhealthy_hosts_alarm_evaluation_periods" {
   type    = "string"
-  default = "2"
+  default = "10"
 }

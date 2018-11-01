@@ -26,11 +26,6 @@ output "load_balancer_arn_suffix" {
   value = "${aws_lb.nlb.arn_suffix}"
 }
 
-# output: the ID of the log bucket we are using
-output "load_balancer_log_bucket" {
-  value = "${var.nlb_al_bucket == "__UNSET__" ? element(aws_s3_bucket.nlb_log_bucket.*.id,0) : var.nlb_al_bucket}"
-}
-
 # NLB: ARNs of the target groups. Useful for passing to your Auto Scaling group.
 output "target_group_arns" {
   value = "${flatten(aws_lb_target_group.nlb_tg.*.arn)}"
