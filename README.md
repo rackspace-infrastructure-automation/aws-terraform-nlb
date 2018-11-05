@@ -69,6 +69,9 @@ module "nlb" {
 }
 ```
 
+## Limitations
+
+- Current module does not support the use of elastic IPs on the NLB at this time, due to a limitation in generating the SubnetMappings list.  This is expected to be corrected with the release of terraform v0.12.
 
 
 ## Inputs
@@ -77,7 +80,6 @@ module "nlb" {
 |------|-------------|:----:|:-----:|:-----:|
 | enable_cloudwatch_alarm_actions |  | string | `false` | no |
 | environment | Label: environment name e.g. dev; prod | string | `test` | no |
-| nlb_alarm_topic | CloudWatch: SNS topic for alarm actions | string | `rackspace-support-emergency` | no |
 | nlb_cross_zone | NLB: configure cross zone load balancing | string | `true` | no |
 | nlb_eni_count | VPC: explicitly tell terraform how many subnets to expect | string | `0` | no |
 | nlb_facing | NLB: is this load-balancer "internal" or "external"? | string | `external` | no |
@@ -88,9 +90,6 @@ module "nlb" {
 | nlb_subnet_map | VPC: **not implemented** subnet -> EIP mapping | map | `<map>` | no |
 | nlb_tags | Label: tags map | map | `<map>` | no |
 | nlb_tg_map | /*   NLB: target group map<br><br>e.g. nlb_tg_map  = {   "listener1" = {     "name"          = "listener1-tg-name"     "port"          = "80"     "dereg_delay"   = "300"     "target_type"   = "instance"   } } */ | map | - | yes |
-| nlb_unhealthy_hosts_alarm_evaluation_periods | CloudWatch: alarm sample count threhold | string | `10` | no |
-| nlb_unhealthy_hosts_alarm_period | CloudWatch: alarm sample period in seconds | string | `60` | no |
-| nlb_unhealthy_hosts_alarm_threshold | CloudWatch: number of unhealthy hosts to trigger on | string | `1` | no |
 | route53_zone_id | Route53: the zone_id in which to create our CNAME | string | `__UNSET__` | no |
 | vpc_id | VPC: VPC ID | string | - | yes |
 

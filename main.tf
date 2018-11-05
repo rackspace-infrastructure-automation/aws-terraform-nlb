@@ -3,7 +3,7 @@
 *
 * This module provides the functionality to deploy a Network Load Balancer complete with listeners and target groups.
 *
-* ## Usage: 
+* ## Usage:
 *this and other examples available [here](examples/)
 *
 *```
@@ -70,6 +70,9 @@
 *}
 *```
 *
+ * ## Limitations
+ *
+ * - Current module does not support the use of elastic IPs on the NLB at this time, due to a limitation in generating the SubnetMappings list.  This is expected to be corrected with the release of terraform v0.12.
 **/
 
 resource "aws_lb" "nlb" {

@@ -41,7 +41,7 @@ module "vpc" {
 module "nlb_external" {
   source = "../../module"
 
-  nlb_name       = "${random_string.rstring.result}-test-nlb"
+  nlb_name       = "${random_string.rstring.result}-nlb-ext"
   vpc_id         = "${module.vpc.vpc_id}"
   nlb_subnet_ids = "${module.vpc.public_subnets}"
   nlb_eni_count  = 2
@@ -73,7 +73,7 @@ module "nlb_external" {
 module "nlb_internal" {
   source = "../../module"
 
-  nlb_name       = "${random_string.rstring.result}-test-nlb"
+  nlb_name       = "${random_string.rstring.result}-nlb-int"
   vpc_id         = "${module.vpc.vpc_id}"
   nlb_subnet_ids = "${module.vpc.private_subnets}"
   nlb_eni_count  = 2
