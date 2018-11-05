@@ -137,7 +137,7 @@ resource "aws_cloudwatch_metric_alarm" "nlb_unhealthy_hosts" {
   actions_enabled = "${var.enable_cloudwatch_alarm_actions}"
 
   alarm_actions = [
-    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.nlb_alarm_topic}",
+    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
   ]
 
   alarm_description   = "Unhealthy Host count is above threshold, creating ticket."
@@ -149,7 +149,7 @@ resource "aws_cloudwatch_metric_alarm" "nlb_unhealthy_hosts" {
     TargetGroup  = "${aws_lb_target_group.nlb_tg.*.arn_suffix[count.index]}"
   }
 
-  evaluation_periods = "${var.nlb_unhealthy_hosts_alarm_evaluation_periods}"
+  evaluation_periods = "10"
   metric_name        = "UnHealthyHostCount"
   namespace          = "AWS/NetworkELB"
 
@@ -157,8 +157,8 @@ resource "aws_cloudwatch_metric_alarm" "nlb_unhealthy_hosts" {
     "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
   ]
 
-  period    = "${var.nlb_unhealthy_hosts_alarm_period}"
+  period    = "60"
   statistic = "Maximum"
-  threshold = "${var.nlb_unhealthy_hosts_alarm_threshold}"
+  threshold = "1"
   unit      = "Count"
 }

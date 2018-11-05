@@ -114,31 +114,3 @@ variable "enable_cloudwatch_alarm_actions" {
   type    = "string"
   default = "false"
 }
-
-#
-#      CloudWatch Monitoring for Target Groups
-#
-
-# CloudWatch: SNS topic for alarm actions
-variable "nlb_alarm_topic" {
-  type    = "string"
-  default = "rackspace-support-emergency"
-}
-
-# CloudWatch: alarm sample period in seconds
-variable "nlb_unhealthy_hosts_alarm_period" {
-  type    = "string"
-  default = "60"
-}
-
-# CloudWatch: number of unhealthy hosts to trigger on
-variable "nlb_unhealthy_hosts_alarm_threshold" {
-  type    = "string"
-  default = "1"
-}
-
-# CloudWatch: alarm sample count threhold
-variable "nlb_unhealthy_hosts_alarm_evaluation_periods" {
-  type    = "string"
-  default = "10"
-}
