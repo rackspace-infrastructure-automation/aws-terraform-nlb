@@ -1,4 +1,4 @@
-# Determine NLB AWS Account ID for bucket policy: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy 
+# Determine NLB AWS Account ID for bucket policy: https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/enable-access-logs.html#attach-bucket-policy
 data "aws_elb_service_account" "nlb_svc_acct" {}
 
 data "aws_region" "current" {}
@@ -17,7 +17,7 @@ data "aws_network_interface" "nlb_eni" {
   # this data source does not permit muliple results
 
   # Allow for a static value for nlb_eni_count
-  count = "${var.nlb_eni_count > 0 ? "${var.nlb_eni_count}" : length(var.nlb_subnet_ids)}"
+  count = "${var.nlb_eni_count}"
 
   filter {
     name = "description"
