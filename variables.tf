@@ -1,5 +1,5 @@
 # Label: name for this load balancer
-variable "nlb_name" {
+variable "name" {
   type = "string"
 }
 
@@ -16,12 +16,12 @@ variable "route53_zone_id" {
 }
 
 # VPC: list of subnet ids (1 per AZ only) to attach to this NLB
-variable "nlb_subnet_ids" {
+variable "subnet_ids" {
   type = "list"
 }
 
 # VPC: explicitly tell terraform how many subnets to expect
-variable "nlb_eni_count" {
+variable "eni_count" {
   default = "0"
 }
 
@@ -31,7 +31,7 @@ variable "vpc_id" {
 }
 
 # VPC: **not implemented** subnet -> EIP mapping
-variable "nlb_subnet_map" {
+variable "subnet_map" {
   type = "map"
 
   default = {
@@ -39,18 +39,18 @@ variable "nlb_subnet_map" {
   }
 }
 
-# NLB: is this load-balancer "internal" or "external"? 
-variable "nlb_facing" {
+# NLB: is this load-balancer "internal" or "external"?
+variable "facing" {
   default = "external"
 }
 
 # NLB: configure cross zone load balancing
-variable "nlb_cross_zone" {
+variable "cross_zone" {
   default = true
 }
 
 # Label: tags map
-variable "nlb_tags" {
+variable "tags" {
   type = "map"
 
   default = {}
@@ -59,14 +59,14 @@ variable "nlb_tags" {
 /*  NLB: listener map
 
 e.g.
-nlb_listener_map = {
+listener_map = {
   "0" = {
     "port"            = "80"
     "target_group"    = "arn:aws:elasticloadbalancing:xxxxxxx" # optionally specify existing TG ARN
   }
 }
 */
-variable "nlb_listener_map" {
+variable "listener_map" {
   type = "map"
 }
 
@@ -74,7 +74,7 @@ variable "nlb_listener_map" {
   NLB: target group map
 
 e.g.
-nlb_tg_map  = {
+tg_map  = {
   "listener1" = {
     "name"          = "listener1-tg-name"
     "port"          = "80"
@@ -83,13 +83,13 @@ nlb_tg_map  = {
   }
 }
 */
-variable "nlb_tg_map" {
+variable "tg_map" {
   type = "map"
 }
 
 /* NLB: tg health checks
 e.g.
-nlb_hc_map  = {
+hc_map  = {
   "listener1" = {
       protocol            = "TCP"
       healthy_threshold   = "3"
@@ -106,7 +106,7 @@ nlb_hc_map  = {
     }
 }
 */
-variable "nlb_hc_map" {
+variable "hc_map" {
   type = "map"
 }
 

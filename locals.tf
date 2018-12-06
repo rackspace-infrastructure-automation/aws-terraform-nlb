@@ -11,9 +11,9 @@ locals {
     interval            = 30
   }
 
-  tg_keys = "${keys(var.nlb_tg_map)}"
-  lm_keys = "${keys(var.nlb_listener_map)}"
-  hc_keys = "${keys(var.nlb_hc_map)}"
+  tg_keys = "${keys(var.tg_map)}"
+  lm_keys = "${keys(var.listener_map)}"
+  hc_keys = "${keys(var.hc_map)}"
 
-  tags = "${merge(var.nlb_tags, map("Environment", "${var.environment}", "ServiceProvider", "Rackspace"))}"
+  tags = "${merge(var.tags, map("Environment", "${var.environment}", "ServiceProvider", "Rackspace"))}"
 }
