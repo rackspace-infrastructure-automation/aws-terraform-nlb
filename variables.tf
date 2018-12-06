@@ -9,10 +9,22 @@ variable environment {
   default = "test"
 }
 
-# Route53: the zone_id in which to create our CNAME
-variable "route53_zone_id" {
+variable "create_internal_zone_record" {
+  description = "Create Route 53 internal zone record for the NLB. i.e true | false"
+  type        = "string"
+  default     = false
+}
+
+variable "internal_record_name" {
+  description = "Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com"
+  type        = "string"
+  default     = ""
+}
+
+# Route53: the zone_id in which to create our ALIAS
+variable "route_53_hosted_zone_id" {
   type    = "string"
-  default = "__UNSET__"
+  default = ""
 }
 
 # VPC: list of subnet ids (1 per AZ only) to attach to this NLB

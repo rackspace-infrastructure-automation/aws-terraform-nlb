@@ -70,14 +70,34 @@ module "external" {
   }
 }
 
+resource "random_string" "random_zone" {
+  length  = 6
+  upper   = false
+  lower   = true
+  special = false
+  number  = false
+}
+
+resource "aws_route53_zone" "private" {
+  name          = "${random_string.random_zone.result}.com"
+  force_destroy = true
+
+  vpc {
+    vpc_id = "${module.vpc.vpc_id}"
+  }
+}
+
 module "internal" {
   source = "../../module"
 
-  name       = "${random_string.rstring.result}-nlb-int"
-  vpc_id     = "${module.vpc.vpc_id}"
-  subnet_ids = "${module.vpc.private_subnets}"
-  eni_count  = 2
-  facing     = "internal"
+  name                        = "${random_string.rstring.result}-nlb-int"
+  vpc_id                      = "${module.vpc.vpc_id}"
+  subnet_ids                  = "${module.vpc.private_subnets}"
+  eni_count                   = 2
+  facing                      = "internal"
+  create_internal_zone_record = true
+  route_53_hosted_zone_id     = "${aws_route53_zone.private.zone_id}"
+  internal_record_name        = "nlb.${aws_route53_zone.private.name}"
 
   listener_map = {
     listener1 = {
