@@ -1,19 +1,19 @@
 module "nlb" {
-  source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=<git tag, branch, or commit hash here>"
-  environment    = "Test"
-  nlb_name       = "MyNLB"
-  vpc_id         = "vpc-xxxxxxxxxxxxxxxx"
-  nlb_subnet_ids = ["subnet-xxxxxxxxxxxxxxxx", "subnet-xxxxxxxxxxxxxxxx"]
+  source      = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=<git tag, branch, or commit hash here>"
+  environment = "Test"
+  name        = "MyNLB"
+  vpc_id      = "vpc-xxxxxxxxxxxxxxxx"
+  subnet_ids  = ["subnet-xxxxxxxxxxxxxxxx", "subnet-xxxxxxxxxxxxxxxx"]
 
   # enable alarm actions for TG alarms. vars available for these parameters
   enable_cloudwatch_alarm_actions = "true"
 
-  nlb_tags = {
+  tags = {
     "role"    = "load-balancer"
     "contact" = "someone@somewhere.com"
   }
 
-  nlb_listener_map = {
+  listener_map = {
     listener1 = {
       port = 80
     }
@@ -24,7 +24,7 @@ module "nlb" {
   }
 
   # if `name` is not defined, then the map index is used for this value
-  nlb_tg_map = {
+  tg_map = {
     listener1 = {
       name        = "listener1-tg-name"
       port        = 80
@@ -40,7 +40,7 @@ module "nlb" {
     }
   }
 
-  nlb_hc_map = {
+  hc_map = {
     listener1 = {
       protocol            = "TCP"
       healthy_threshold   = 3

@@ -28,20 +28,20 @@ output "load_balancer_arn_suffix" {
 
 # NLB: ARNs of the target groups. Useful for passing to your Auto Scaling group.
 output "target_group_arns" {
-  value = "${flatten(aws_lb_target_group.nlb_tg.*.arn)}"
+  value = "${flatten(aws_lb_target_group.tg.*.arn)}"
 }
 
 # NLB: ARN suffixes of our target groups - can be used with CloudWatch.
 output "target_group_arn_suffixes" {
-  value = "${flatten(aws_lb_target_group.nlb_tg.*.arn_suffix)}"
+  value = "${flatten(aws_lb_target_group.tg.*.arn_suffix)}"
 }
 
 # NLB: Name of the target group. Useful for passing to your CodeDeploy Deployment Group
 output "target_group_names" {
-  value = "${flatten(aws_lb_target_group.nlb_tg.*.name)}"
+  value = "${flatten(aws_lb_target_group.tg.*.name)}"
 }
 
 # NLB: the private IPs of this LB for use in EC2 security groups
-output "nlb_eni_ips" {
-  value = "${flatten(data.aws_network_interface.nlb_eni.*.private_ips)}"
+output "eni_ips" {
+  value = "${flatten(data.aws_network_interface.eni.*.private_ips)}"
 }

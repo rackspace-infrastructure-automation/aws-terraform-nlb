@@ -38,21 +38,21 @@ module "vpc" {
   vpc_name            = "${random_string.rstring.result}-test"
 }
 
-module "nlb_external" {
+module "external" {
   source = "../../module"
 
-  nlb_name       = "${random_string.rstring.result}-nlb-ext"
-  vpc_id         = "${module.vpc.vpc_id}"
-  nlb_subnet_ids = "${module.vpc.public_subnets}"
-  nlb_eni_count  = 2
+  name       = "${random_string.rstring.result}-nlb-ext"
+  vpc_id     = "${module.vpc.vpc_id}"
+  subnet_ids = "${module.vpc.public_subnets}"
+  eni_count  = 2
 
-  nlb_listener_map = {
+  listener_map = {
     listener1 = {
       port = 80
     }
   }
 
-  nlb_tg_map = {
+  tg_map = {
     listener1 = {
       port        = 80
       dereg_delay = 300
@@ -60,7 +60,7 @@ module "nlb_external" {
     }
   }
 
-  nlb_hc_map = {
+  hc_map = {
     listener1 = {
       protocol            = "TCP"
       healthy_threshold   = 3
@@ -70,22 +70,22 @@ module "nlb_external" {
   }
 }
 
-module "nlb_internal" {
+module "internal" {
   source = "../../module"
 
-  nlb_name       = "${random_string.rstring.result}-nlb-int"
-  vpc_id         = "${module.vpc.vpc_id}"
-  nlb_subnet_ids = "${module.vpc.private_subnets}"
-  nlb_eni_count  = 2
-  nlb_facing     = "internal"
+  name       = "${random_string.rstring.result}-nlb-int"
+  vpc_id     = "${module.vpc.vpc_id}"
+  subnet_ids = "${module.vpc.private_subnets}"
+  eni_count  = 2
+  facing     = "internal"
 
-  nlb_listener_map = {
+  listener_map = {
     listener1 = {
       port = 80
     }
   }
 
-  nlb_tg_map = {
+  tg_map = {
     listener1 = {
       port        = 80
       dereg_delay = 300
@@ -93,7 +93,7 @@ module "nlb_internal" {
     }
   }
 
-  nlb_hc_map = {
+  hc_map = {
     listener1 = {
       protocol            = "HTTP"
       healthy_threshold   = 3
@@ -122,5 +122,5 @@ module "asg" {
   scaling_max         = "2"
   scaling_min         = "1"
   subnets             = ["${element(module.vpc.public_subnets, 0)}", "${element(module.vpc.public_subnets, 1)}"]
-  target_group_arns   = ["${concat(module.nlb_external.target_group_arns, module.nlb_internal.target_group_arns)}"]
+  target_group_arns   = ["${concat(module.external.target_group_arns, module.internal.target_group_arns)}"]
 }
