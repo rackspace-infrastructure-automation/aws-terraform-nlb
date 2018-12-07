@@ -55,7 +55,3 @@ data "aws_network_interfaces" "enis" {
 }
 */
 
-data "aws_route53_zone" "provided" {
-  count   = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
-  zone_id = "${var.route53_zone_id}"
-}

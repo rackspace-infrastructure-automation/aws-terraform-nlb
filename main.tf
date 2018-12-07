@@ -1,4 +1,4 @@
-/**
+/*
 * # aws-terraform-nlb
 *
 * This module provides the functionality to deploy a Network Load Balancer complete with listeners and target groups.
@@ -73,7 +73,7 @@
  * ## Limitations
  *
  * - Current module does not support the use of elastic IPs on the NLB at this time, due to a limitation in generating the SubnetMappings list.  This is expected to be corrected with the release of terraform v0.12.
-**/
+*/
 
 resource "aws_lb" "nlb" {
   name               = "${var.name}"
@@ -125,14 +125,17 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-resource "aws_route53_record" "route53_cname" {
-  count = "${var.route53_zone_id == "__UNSET__" ? 0:1}"
+resource "aws_route53_record" "route53_record" {
+  count   = "${var.create_internal_zone_record ? 1 : 0}"
+  zone_id = "${var.route_53_hosted_zone_id}"
+  name    = "${var.internal_record_name}"
+  type    = "A"
 
-  zone_id = "${var.route53_zone_id}"
-  name    = "${var.name}-${var.environment}-nlb"
-  records = ["${aws_lb.nlb.dns_name}"]
-  type    = "CNAME"
-  ttl     = "5"
+  alias {
+    evaluate_target_health = true
+    name                   = "${aws_lb.nlb.dns_name}"
+    zone_id                = "${aws_lb.nlb.zone_id}"
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
