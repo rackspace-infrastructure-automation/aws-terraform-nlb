@@ -7,7 +7,7 @@ this and other examples available [here](examples/)
 
 ```
 module "nlb" {
- source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=<git tag, branch, or commit hash here>"
+ source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.2"
  environment    = "Test"
  name       = "MyNLB"
 
@@ -85,10 +85,10 @@ module "nlb" {
 | environment | Label: environment name e.g. dev; prod | string | `test` | no |
 | facing | NLB: is this load-balancer "internal" or "external"? | string | `external` | no |
 | hc_map | /* NLB: tg health checks e.g. hc_map  = {   "listener1" = {       protocol            = "TCP"       healthy_threshold   = "3"       unhealthy_threshold = "3"       interval            = "30"     }   "listener2" = {       protocol            = "HTTP"       healthy_threshold   = "3"       unhealthy_threshold = "3"       interval            = "30"       matcher             = "200-399"       path                = "/"     } } */ | map | - | yes |
+| internal_record_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com | string | `` | no |
 | listener_map | /*  NLB: listener map<br><br>e.g. listener_map = {   "0" = {     "port"            = "80"     "target_group"    = "arn:aws:elasticloadbalancing:xxxxxxx" # optionally specify existing TG ARN   } } */ | map | - | yes |
 | name | Label: name for this load balancer | string | - | yes |
-| route53_internal_record_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com | string | `` | no |
-| route53_zone_id | Route53: the zone_id in which to create our CNAME | string | `` | no |
+| route_53_hosted_zone_id | Route53: the zone_id in which to create our ALIAS | string | `` | no |
 | subnet_ids | VPC: list of subnet ids (1 per AZ only) to attach to this NLB | list | - | yes |
 | subnet_map | VPC: **not implemented** subnet -> EIP mapping | map | `<map>` | no |
 | tags | Label: tags map | map | `<map>` | no |
@@ -107,3 +107,4 @@ module "nlb" {
 | target_group_arn_suffixes | NLB: ARN suffixes of our target groups - can be used with CloudWatch. |
 | target_group_arns | NLB: ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target_group_names | NLB: Name of the target group. Useful for passing to your CodeDeploy Deployment Group |
+
