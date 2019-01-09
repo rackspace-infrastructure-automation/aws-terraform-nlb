@@ -1,12 +1,12 @@
-# Label: name for this load balancer
 variable "name" {
-  type = "string"
+  type        = "string"
+  description = "name for this load balancer"
 }
 
-# Label: environment name e.g. dev; prod
-variable environment {
-  type    = "string"
-  default = "test"
+variable "environment" {
+  type        = "string"
+  default     = "test"
+  description = "environment name e.g. dev; prod"
 }
 
 variable "create_internal_zone_record" {
@@ -21,49 +21,52 @@ variable "internal_record_name" {
   default     = ""
 }
 
-# Route53: the zone_id in which to create our ALIAS
 variable "route_53_hosted_zone_id" {
-  type    = "string"
-  default = ""
+  type        = "string"
+  default     = ""
+  description = "the zone_id in which to create our ALIAS"
 }
 
-# VPC: list of subnet ids (1 per AZ only) to attach to this NLB
 variable "subnet_ids" {
-  type = "list"
+  type        = "list"
+  description = "list of subnet ids (1 per AZ only) to attach to this NLB"
 }
 
-# VPC: explicitly tell terraform how many subnets to expect
 variable "eni_count" {
-  default = "0"
+  default     = "0"
+  type        = "string"
+  description = "explicitly tell terraform how many subnets to expect"
 }
 
-# VPC: VPC ID
 variable "vpc_id" {
-  type = "string"
+  type        = "string"
+  description = "VPC ID"
 }
 
-# VPC: **not implemented** subnet -> EIP mapping
 variable "subnet_map" {
-  type = "map"
+  type        = "map"
+  description = "**not implemented** subnet -> EIP mapping"
 
   default = {
     "0" = ["eip-1", "subnet-1"]
   }
 }
 
-# NLB: is this load-balancer "internal" or "external"?
 variable "facing" {
-  default = "external"
+  default     = "external"
+  type        = "string"
+  description = "is this load-balancer internal or external?"
 }
 
-# NLB: configure cross zone load balancing
 variable "cross_zone" {
-  default = true
+  default     = true
+  type        = "string"
+  description = "configure cross zone load balancing"
 }
 
-# Label: tags map
 variable "tags" {
-  type = "map"
+  type        = "map"
+  description = "tags map"
 
   default = {}
 }
@@ -79,7 +82,8 @@ listener_map = {
 }
 */
 variable "listener_map" {
-  type = "map"
+  type        = "map"
+  description = "listener map"
 }
 
 /*
@@ -96,7 +100,8 @@ tg_map  = {
 }
 */
 variable "tg_map" {
-  type = "map"
+  type        = "map"
+  description = "target group map"
 }
 
 /* NLB: tg health checks
@@ -119,10 +124,12 @@ hc_map  = {
 }
 */
 variable "hc_map" {
-  type = "map"
+  type        = "map"
+  description = "health check map"
 }
 
 variable "enable_cloudwatch_alarm_actions" {
-  type    = "string"
-  default = "false"
+  type        = "string"
+  default     = "false"
+  description = "enable cloudwatch alarm actions true or false"
 }
