@@ -8,7 +8,7 @@
  *
  *```
  *module "nlb" {
- *  source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.2"
+ *  source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.3"
  *  environment    = "Test"
  *  name       = "MyNLB"
  *
@@ -138,33 +138,32 @@ resource "aws_route53_record" "route53_record" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
-  count           = "${length(local.tg_keys)}"
-  actions_enabled = "${var.enable_cloudwatch_alarm_actions}"
+data "null_data_source" "alarm_dimensions" {
+  count = "${length(local.tg_keys)}"
 
-  alarm_actions = [
-    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
-  ]
-
-  alarm_description   = "Unhealthy Host count is above threshold, creating ticket."
-  alarm_name          = "NLB Unhealthy Host Count - ${aws_lb.nlb.name}-${aws_lb_target_group.tg.*.name[count.index]}"
-  comparison_operator = "GreaterThanThreshold"
-
-  dimensions = {
+  inputs = {
     LoadBalancer = "${aws_lb.nlb.arn_suffix}"
     TargetGroup  = "${aws_lb_target_group.tg.*.arn_suffix[count.index]}"
   }
+}
 
-  evaluation_periods = "10"
-  metric_name        = "UnHealthyHostCount"
-  namespace          = "AWS/NetworkELB"
+module "unhealthy_host_count_alarm" {
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
 
-  ok_actions = [
-    "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rackspace-support-emergency",
-  ]
-
-  period    = "60"
-  statistic = "Maximum"
-  threshold = "1"
-  unit      = "Count"
+  alarm_count              = "${length(local.tg_keys)}"
+  alarm_description        = "Unhealthy Host count is above threshold, creating ticket."
+  alarm_name               = "NLB Unhealthy Host Count - ${aws_lb.nlb.name}"
+  comparison_operator      = "GreaterThanOrEqualToThreshold"
+  dimensions               = "${data.null_data_source.alarm_dimensions.*.outputs}"
+  evaluation_periods       = 10
+  metric_name              = "UnHealthyHostCount"
+  namespace                = "AWS/NetworkELB"
+  notification_topic       = "${var.notification_topic}"
+  period                   = 60
+  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
+  rackspace_managed        = "${var.rackspace_managed}"
+  severity                 = "emergency"
+  statistic                = "Maximum"
+  threshold                = 1
+  unit                     = "Count"
 }

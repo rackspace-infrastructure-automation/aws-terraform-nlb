@@ -128,8 +128,20 @@ variable "hc_map" {
   description = "health check map"
 }
 
-variable "enable_cloudwatch_alarm_actions" {
+variable "notification_topic" {
+  description = "List of SNS Topic ARNs to use for customer notifications."
+  type        = "list"
+  default     = []
+}
+
+variable "rackspace_managed" {
+  description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
   type        = "string"
-  default     = "false"
-  description = "enable cloudwatch alarm actions true or false"
+  default     = true
+}
+
+variable "rackspace_alarms_enabled" {
+  description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
+  type        = "string"
+  default     = false
 }

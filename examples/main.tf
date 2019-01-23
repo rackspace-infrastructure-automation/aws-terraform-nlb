@@ -1,5 +1,5 @@
 module "nlb" {
-  source      = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.2"
+  source      = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.3"
   environment = "Test"
   name        = "MyNLB"
   vpc_id      = "vpc-xxxxxxxxxxxxxxxx"
