@@ -7,7 +7,7 @@ this and other examples available [here](examples/)
 
 ```
 module "nlb" {
- source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.2"
+ source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.3"
  environment    = "Test"
  name       = "MyNLB"
 
@@ -79,7 +79,6 @@ module "nlb" {
 |------|-------------|:----:|:-----:|:-----:|
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the NLB. i.e true | false | string | `"false"` | no |
 | cross\_zone | configure cross zone load balancing | string | `"true"` | no |
-| enable\_cloudwatch\_alarm\_actions | enable cloudwatch alarm actions true or false | string | `"false"` | no |
 | eni\_count | explicitly tell terraform how many subnets to expect | string | `"0"` | no |
 | environment | environment name e.g. dev; prod | string | `"test"` | no |
 | facing | is this load-balancer internal or external? | string | `"external"` | no |
@@ -87,6 +86,9 @@ module "nlb" {
 | internal\_record\_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com | string | `""` | no |
 | listener\_map | listener map | map | n/a | yes |
 | name | name for this load balancer | string | n/a | yes |
+| notification\_topic | List of SNS Topic ARNs to use for customer notifications. | list | `<list>` | no |
+| rackspace\_alarms\_enabled | Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false. | string | `"false"` | no |
+| rackspace\_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | string | `"true"` | no |
 | route\_53\_hosted\_zone\_id | the zone_id in which to create our ALIAS | string | `""` | no |
 | subnet\_ids | list of subnet ids (1 per AZ only) to attach to this NLB | list | n/a | yes |
 | subnet\_map | **not implemented** subnet -> EIP mapping | map | `<map>` | no |
