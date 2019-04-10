@@ -19,7 +19,9 @@ module "nlb" {
     }
 
     listener2 = {
-      port = 8080
+      certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      port            = 443
+      protocol        = "TLS"
     }
   }
 

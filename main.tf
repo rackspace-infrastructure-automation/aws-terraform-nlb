@@ -29,7 +29,9 @@
  *    }
  *
  *    listener2 = {
- *      port = 8080
+ *      certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+ *      port     = 443
+ *      protocol = "TLS"
  *    }
  *  }
  *
@@ -91,37 +93,44 @@ resource "aws_lb_target_group" "tg" {
 
   vpc_id = "${var.vpc_id}"
 
-  name = "${lookup(var.tg_map[element(local.tg_keys,count.index)],"name", "__UNSET__") == "__UNSET__"
-       ? "${var.name}-${element(local.tg_keys,count.index)}-tg"
-       : lookup(var.tg_map[element(local.tg_keys,count.index)],"name", "__UNSET__")}"
+  name = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "name",
+                   "${var.name}-${element(local.tg_keys, count.index)}-tg")}"
 
-  port                 = "${lookup(var.tg_map[element(local.tg_keys,count.index)],"port")}"
+  port                 = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "port")}"
   protocol             = "TCP"
-  deregistration_delay = "${lookup(var.tg_map[element(local.tg_keys,count.index)],"dereg_delay","300")}"
-  target_type          = "${lookup(var.tg_map[element(local.tg_keys,count.index)],"target_type","instance")}"
+  deregistration_delay = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "dereg_delay", "300")}"
+  target_type          = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "target_type", "instance")}"
 
   tags = "${local.tags}"
 
   health_check {
-    protocol            = "${lookup(var.hc_map[element(local.hc_keys,count.index)],"protocol")}"
-    healthy_threshold   = "${lookup(var.hc_map[element(local.hc_keys,count.index)],"healthy_threshold","3")}"
-    unhealthy_threshold = "${lookup(var.hc_map[element(local.hc_keys,count.index)],"unhealthy_threshold","3")}"
-    interval            = "${lookup(var.hc_map[element(local.hc_keys,count.index)],"interval","30")}"
-    matcher             = "${lookup(var.hc_map[element(local.hc_keys,count.index)],"matcher","")}"
-    path                = "${lookup(var.hc_map[element(local.hc_keys,count.index)],"path","")}"
+    protocol            = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "protocol")}"
+    healthy_threshold   = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "healthy_threshold", "3")}"
+    unhealthy_threshold = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "unhealthy_threshold", "3")}"
+    interval            = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "interval", "30")}"
+    matcher             = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "matcher", "")}"
+    path                = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "path", "")}"
   }
 }
 
 resource "aws_lb_listener" "listener" {
   count = "${length(local.lm_keys)}"
 
+  certificate_arn   = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "certificate_arn", "")}"
   load_balancer_arn = "${aws_lb.nlb.arn}"
-  port              = "${lookup(var.listener_map[element(local.lm_keys,count.index)],"port")}"
-  protocol          = "TCP"
+  port              = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "port")}"
+  protocol          = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "protocol", "TCP")}"
+
+  ssl_policy = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "protocol", "TCP") == "TCP" ? "" :
+                  lookup(var.listener_map[element(local.lm_keys, count.index)], "ssl_policy",
+                         "ELBSecurityPolicy-TLS-1-2-2017-01")}"
 
   default_action {
-    target_group_arn = "${aws_lb_target_group.tg.*.arn[count.index]}"
-    type             = "forward"
+    type = "forward"
+
+    target_group_arn = "${lookup(var.listener_map[element(local.lm_keys, count.index)],
+                                 "target_group",
+                                 element(aws_lb_target_group.tg.*.arn, count.index))}"
   }
 }
 
