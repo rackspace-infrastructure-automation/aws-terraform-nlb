@@ -23,6 +23,12 @@ data "aws_ami" "amz_linux_2" {
   }
 }
 
+data "aws_acm_certificate" "cert" {
+  domain      = "www.mupo181ve1jco37.net"
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
+
 resource "random_string" "rstring" {
   length  = 8
   upper   = false
@@ -49,6 +55,12 @@ module "external" {
   listener_map = {
     listener1 = {
       port = 80
+    }
+
+    listener2 = {
+      certificate_arn = "${data.aws_acm_certificate.cert.arn}"
+      port            = 443
+      protocol        = "TLS"
     }
   }
 

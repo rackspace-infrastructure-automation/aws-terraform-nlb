@@ -76,7 +76,10 @@ variable "tags" {
 e.g.
 listener_map = {
   "0" = {
+    "certificate_arn" = "arn:aws:acm:us-east-1:123456789012:certificate/12345678-90ab-cdef-1234-567890abcdef>" # Required for the TLS protocol
     "port"            = "80"
+    "protocol"        = "TCP" # Defaults to TCP.  Allowed values: TCP, TLS
+    "ssl_protocol"    = "ELBSecurityPolicy-TLS-1-2-2017-02" # Optional, to set a specific SSL Policy.
     "target_group"    = "arn:aws:elasticloadbalancing:xxxxxxx" # optionally specify existing TG ARN
   }
 }
