@@ -14,16 +14,13 @@ resource "random_id" "random_string" {
 }
 
 data "aws_network_interface" "eni" {
-  # this data source does not permit muliple results
-
-  # Allow for a static value for eni_count
-  count = "${var.eni_count}"
+  count = "${length(var.subnet_ids)}"
 
   filter {
     name = "description"
 
     values = [
-      "ELB net/${var.name}/*",
+      "ELB ${aws_lb.nlb.arn_suffix}",
     ]
   }
 
@@ -34,24 +31,4 @@ data "aws_network_interface" "eni" {
       "${element(var.subnet_ids,count.index)}",
     ]
   }
-
-  # terraform has no way of determining this dependency unaided
-  depends_on = ["aws_lb.nlb"]
 }
-
-/*
-# Error: data.aws_network_interfaces.enis: Provider doesn't support data source: aws_network_interfaces
-# and yet: https://www.terraform.io/docs/providers/aws/d/network_interfaces.html
-
-data "aws_network_interfaces" "enis" {
-  filter {
-    name = "description"
-
-    values = [
-      "ELB net/${var.name}/*",
-    ]
-  }
-  depends_on = ["aws_lb.nlb"]
-}
-*/
-
