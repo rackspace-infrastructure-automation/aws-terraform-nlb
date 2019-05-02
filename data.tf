@@ -32,3 +32,17 @@ data "aws_network_interface" "eni" {
     ]
   }
 }
+
+/*
+# Error: data.aws_network_interfaces.enis: Provider doesn't support data source: aws_network_interfaces
+# and yet: https://www.terraform.io/docs/providers/aws/d/network_interfaces.html
+data "aws_network_interfaces" "enis" {
+  filter {
+    name = "description"
+    values = [
+      "ELB net/${var.name}/*",
+    ]
+  }
+  depends_on = ["aws_lb.nlb"]
+}
+*/
