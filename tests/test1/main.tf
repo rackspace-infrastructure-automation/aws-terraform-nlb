@@ -47,10 +47,11 @@ module "vpc" {
 module "external" {
   source = "../../module"
 
-  name       = "${random_string.rstring.result}-nlb-ext"
-  vpc_id     = "${module.vpc.vpc_id}"
-  subnet_ids = "${module.vpc.public_subnets}"
-  eni_count  = 2
+  name               = "${random_string.rstring.result}-nlb-ext"
+  vpc_id             = "${module.vpc.vpc_id}"
+  subnet_ids         = "${module.vpc.public_subnets}"
+  listener_map_count = 2
+  eni_count          = 2
 
   listener_map = {
     listener1 = {
