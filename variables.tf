@@ -21,6 +21,12 @@ variable "internal_record_name" {
   default     = ""
 }
 
+variable "listener_map_count" {
+  description = "The number of listener maps to utilize"
+  type        = "string"
+  default     = "1"
+}
+
 variable "route_53_hosted_zone_id" {
   type        = "string"
   default     = ""

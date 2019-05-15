@@ -114,7 +114,7 @@ resource "aws_lb_target_group" "tg" {
 }
 
 resource "aws_lb_listener" "listener" {
-  count = "${length(local.lm_keys)}"
+  count = "${var.listener_map_count}"
 
   certificate_arn   = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "certificate_arn", "")}"
   load_balancer_arn = "${aws_lb.nlb.arn}"

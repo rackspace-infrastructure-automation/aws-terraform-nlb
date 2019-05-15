@@ -87,6 +87,7 @@ module "nlb" {
 | hc\_map | health check map | map | n/a | yes |
 | internal\_record\_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com | string | `""` | no |
 | listener\_map | listener map | map | n/a | yes |
+| listener\_map\_count | The number of listener maps to utilize | string | `"1"` | no |
 | name | name for this load balancer | string | n/a | yes |
 | notification\_topic | List of SNS Topic ARNs to use for customer notifications. | list | `<list>` | no |
 | rackspace\_alarms\_enabled | Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false. | string | `"false"` | no |
