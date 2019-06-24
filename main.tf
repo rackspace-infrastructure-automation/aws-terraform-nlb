@@ -75,6 +75,9 @@
  * ## Limitations
  *
  * - Current module does not support the use of elastic IPs on the NLB at this time, due to a limitation in generating the SubnetMappings list.  This is expected to be corrected with the release of terraform v0.12.
+ * ## Other TF Modules Used
+ * Using [aws-terraform-cloudwatch_alarm](https://github.com/rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm) to create the following CloudWatch Alarms:
+ * 	- unhealthy_host_count_alarm
  */
 
 resource "aws_lb" "nlb" {
