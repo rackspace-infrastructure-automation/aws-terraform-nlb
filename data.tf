@@ -5,14 +5,6 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-resource "random_id" "random_string" {
-  byte_length = 8
-
-  keepers {
-    name = "${var.name}"
-  }
-}
-
 data "aws_network_interface" "eni" {
   # this data source does not permit muliple results
 
@@ -23,7 +15,7 @@ data "aws_network_interface" "eni" {
     name = "description"
 
     values = [
-      "ELB net/${var.name}/*",
+      "ELB net/${aws_lb.nlb.name}/*",
     ]
   }
 
