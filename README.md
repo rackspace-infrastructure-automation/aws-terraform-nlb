@@ -3,80 +3,85 @@
 This module provides the functionality to deploy a Network Load Balancer complete with listeners and target groups.
 
 ## Usage:
-this and other examples available [here](examples/)
 
-```
+This and other examples available [here](examples/)
+
+```HCL
 module "nlb" {
- source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.3"
- environment    = "Test"
- name       = "MyNLB"
+  source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.6"
 
- vpc_id = "vpc-xxxxxxxxxxxxxxxxx"
- subnet_ids = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-xxxxxxxxxxxxxxxxx"]
+  # enable alarm actions for TG alarms. vars available for these parameters
+  enable_cloudwatch_alarm_actions = true
+  environment                     = "Test"
 
- # enable alarm actions for TG alarms. vars available for these parameters
- enable_cloudwatch_alarm_actions = "true"
+  hc_map = {
+    listener1 = {
+      protocol            = "TCP"
+      healthy_threshold   = 3
+      unhealthy_threshold = 3
+      interval            = 30
+    }
 
- tags      = {
-     "role"    = "load-balancer"
-     "contact" = "someone@somewhere.com"
- }
+    listener2 = {
+      protocol            = "HTTP"
+      healthy_threshold   = 3
+      unhealthy_threshold = 3
+      interval            = 30
+      matcher             = "200-399"
+      path                = "/"
+    }
+  }
 
- listener_map = {
-   listener1 = {
-     port = 80
-   }
+   listener_map_count = 2
 
-   listener2 = {
-     certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-     port     = 443
-     protocol = "TLS"
-   }
- }
+  listener_map = {
+    listener1 = {
+      port = 80
+    }
 
- # if `name` is not defined, then the map index is used for this value
- tg_map = {
-   listener1 = {
-     name       = "listener1-tg-name"
-     port        = 80
-     dereg_delay = 300
-     target_type = "instance"
-   }
+    listener2 = {
+      certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      port            = 443
+      protocol        = "TLS"
+    }
+  }
 
-   listener2 = {
-     name       = "listener2-tg-name"
-     port        = 8080
-     dereg_delay = 300
-     target_type = "instance"
-   }
- }
+  name       = "MyNLB"
+  subnet_ids = ["subnet-xxxxxxxxxxxxxxxxx", "subnet-xxxxxxxxxxxxxxxxx"]
+  vpc_id     = "vpc-xxxxxxxxxxxxxxxxx"
 
- hc_map = {
-   listener1 = {
-     protocol            = "TCP"
-     healthy_threshold   = 3
-     unhealthy_threshold = 3
-     interval            = 30
-   }
+  tags = {
+    "role"    = "load-balancer"
+    "contact" = "someone@somewhere.com"
+  }
 
-   listener2 = {
-     protocol            = "HTTP"
-     healthy_threshold   = 3
-     unhealthy_threshold = 3
-     interval            = 30
-     matcher             = "200-399"
-     path                = "/"
-   }
- }
+  # if `name` is not defined, then the map index is used for this value
+  tg_map = {
+    listener1 = {
+      name        = "listener1-tg-name"
+      port        = 80
+      dereg_delay = 300
+      target_type = "instance"
+    }
+
+    listener2 = {
+      name        = "listener2-tg-name"
+      port        = 8080
+      dereg_delay = 300
+      target_type = "instance"
+    }
+  }
 }
 ```
 
 ## Limitations
 
 - Current module does not support the use of elastic IPs on the NLB at this time, due to a limitation in generating the SubnetMappings list.  This is expected to be corrected with the release of terraform v0.12.
+
 ## Other TF Modules Used
+
 Using [aws-terraform-cloudwatch_alarm](https://github.com/rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm) to create the following CloudWatch Alarms:
-	- unhealthy_host_count_alarm
+  - unhealthy_host_count_alarm
 
 ## Inputs
 
