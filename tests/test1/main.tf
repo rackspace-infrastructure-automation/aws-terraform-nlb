@@ -115,20 +115,6 @@ module "external" {
       unhealthy_threshold = 3
       interval            = 30
     }
-
-    listener2 = {
-      protocol            = "TCP"
-      healthy_threshold   = 3
-      unhealthy_threshold = 3
-      interval            = 30
-    }
-
-    listener3 = {
-      protocol            = "TCP"
-      healthy_threshold   = 3
-      unhealthy_threshold = 3
-      interval            = 30
-    }
   }
 
   listener_map = {
@@ -141,14 +127,9 @@ module "external" {
       port            = 443
       protocol        = "TLS"
     }
-
-    listener3 = {
-      port     = 53
-      protocol = "UDP"
-    }
   }
 
-  listener_map_count = 3
+  listener_map_count = 1
   name               = "${random_string.rstring.result}-nlb-ext"
   subnet_ids         = "${module.vpc.public_subnets}"
   tags               = "${local.tags}"
@@ -157,19 +138,6 @@ module "external" {
     listener1 = {
       dereg_delay = 300
       port        = 80
-      target_type = "instance"
-    }
-
-    listener2 = {
-      dereg_delay = 300
-      port        = 443
-      target_type = "instance"
-    }
-
-    listener3 = {
-      dereg_delay = 300
-      port        = 53
-      protocol    = "UDP"
       target_type = "instance"
     }
   }
