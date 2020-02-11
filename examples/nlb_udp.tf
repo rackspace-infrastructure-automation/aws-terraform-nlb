@@ -1,3 +1,11 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
+provider "aws" {
+  version = "~> 2.1"
+}
+
 module "nlb" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.6"
 
@@ -42,3 +50,4 @@ module "nlb" {
 
   vpc_id = "vpc-xxxxxxxxxxxxxxxx"
 }
+

@@ -1,56 +1,56 @@
 variable "name" {
-  type        = "string"
+  type        = string
   description = "name for this load balancer"
 }
 
 variable "environment" {
-  type        = "string"
+  type        = string
   default     = "test"
   description = "environment name e.g. dev; prod"
 }
 
 variable "create_internal_zone_record" {
   description = "Create Route 53 internal zone record for the NLB. i.e true | false"
-  type        = "string"
+  type        = string
   default     = false
 }
 
 variable "internal_record_name" {
   description = "Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com"
-  type        = "string"
+  type        = string
   default     = ""
 }
 
 variable "listener_map_count" {
   description = "The number of listener maps to utilize"
-  type        = "string"
+  type        = string
   default     = "1"
 }
 
 variable "route_53_hosted_zone_id" {
-  type        = "string"
+  type        = string
   default     = ""
   description = "the zone_id in which to create our ALIAS"
 }
 
 variable "subnet_ids" {
-  type        = "list"
+  type        = list(string)
   description = "list of subnet ids (1 per AZ only) to attach to this NLB"
 }
 
 variable "eni_count" {
   default     = "0"
-  type        = "string"
+  type        = string
   description = "explicitly tell terraform how many subnets to expect"
 }
 
 variable "vpc_id" {
-  type        = "string"
+  type        = string
   description = "VPC ID"
 }
 
 variable "subnet_map" {
-  type        = "map"
+  type        = map(list(string))
   description = "**not implemented** subnet -> EIP mapping"
 
   default = {
@@ -60,18 +60,18 @@ variable "subnet_map" {
 
 variable "facing" {
   default     = "external"
-  type        = "string"
+  type        = string
   description = "is this load-balancer internal or external?"
 }
 
 variable "cross_zone" {
   default     = true
-  type        = "string"
+  type        = string
   description = "configure cross zone load balancing"
 }
 
 variable "tags" {
-  type        = "map"
+  type        = map(string)
   description = "tags map"
 
   default = {}
@@ -91,7 +91,7 @@ listener_map = {
 }
 */
 variable "listener_map" {
-  type        = "map"
+  type        = map(map(string))
   description = "listener map"
 }
 
@@ -109,7 +109,7 @@ tg_map  = {
 }
 */
 variable "tg_map" {
-  type        = "map"
+  type        = map(map(string))
   description = "target group map"
 }
 
@@ -133,24 +133,25 @@ hc_map  = {
 }
 */
 variable "hc_map" {
-  type        = "map"
+  type        = map(map(string))
   description = "health check map"
 }
 
 variable "notification_topic" {
   description = "List of SNS Topic ARNs to use for customer notifications."
-  type        = "list"
+  type        = list(string)
   default     = []
 }
 
 variable "rackspace_managed" {
   description = "Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents."
-  type        = "string"
+  type        = string
   default     = true
 }
 
 variable "rackspace_alarms_enabled" {
   description = "Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace_managed is set to false."
-  type        = "string"
+  type        = string
   default     = false
 }
+

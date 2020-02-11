@@ -1,3 +1,11 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
+provider "aws" {
+  version = "~> 2.1"
+}
+
 module "nlb" {
   source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.6"
 
@@ -11,7 +19,6 @@ module "nlb" {
       unhealthy_threshold = 3
       interval            = 30
     }
-
     listener2 = {
       protocol            = "HTTP"
       healthy_threshold   = 3
@@ -28,7 +35,6 @@ module "nlb" {
     listener1 = {
       port = 80
     }
-
     listener2 = {
       certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       port            = 443
@@ -51,7 +57,6 @@ module "nlb" {
       dereg_delay = 300
       target_type = "instance"
     }
-
     listener2 = {
       name        = "listener2-tg-name"
       port        = 8080
@@ -62,3 +67,4 @@ module "nlb" {
 
   vpc_id = "vpc-xxxxxxxxxxxxxxxx"
 }
+
