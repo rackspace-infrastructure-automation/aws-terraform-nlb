@@ -9,7 +9,7 @@
  *
  * ```HCL
  * module "nlb" {
- *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.6"
+ *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.12.0"
  *
  *   # enable alarm actions for TG alarms. vars available for these parameters
  *   enable_cloudwatch_alarm_actions = true
@@ -143,6 +143,11 @@ resource "aws_lb_target_group" "tg" {
     "${var.name}-${element(local.tg_keys, count.index)}-tg",
   )
 
+  deregistration_delay = lookup(
+    var.tg_map[element(local.tg_keys, count.index)],
+    "dereg_delay",
+    "300",
+  )
   port = var.tg_map[element(local.tg_keys, count.index)]["port"]
   protocol = upper(
     lookup(
@@ -150,11 +155,6 @@ resource "aws_lb_target_group" "tg" {
       "protocol",
       "TCP",
     ),
-  )
-  deregistration_delay = lookup(
-    var.tg_map[element(local.tg_keys, count.index)],
-    "dereg_delay",
-    "300",
   )
   target_type = lookup(
     var.tg_map[element(local.tg_keys, count.index)],
@@ -165,15 +165,9 @@ resource "aws_lb_target_group" "tg" {
   tags = local.tags
 
   health_check {
-    protocol = upper(var.hc_map[element(local.hc_keys, count.index)]["protocol"])
     healthy_threshold = lookup(
       var.hc_map[element(local.hc_keys, count.index)],
       "healthy_threshold",
-      "3",
-    )
-    unhealthy_threshold = lookup(
-      var.hc_map[element(local.hc_keys, count.index)],
-      "unhealthy_threshold",
       "3",
     )
     interval = lookup(
@@ -186,7 +180,13 @@ resource "aws_lb_target_group" "tg" {
       "matcher",
       "",
     )
-    path = lookup(var.hc_map[element(local.hc_keys, count.index)], "path", "")
+    path     = lookup(var.hc_map[element(local.hc_keys, count.index)], "path", "")
+    protocol = upper(var.hc_map[element(local.hc_keys, count.index)]["protocol"])
+    unhealthy_threshold = lookup(
+      var.hc_map[element(local.hc_keys, count.index)],
+      "unhealthy_threshold",
+      "3",
+    )
   }
 }
 
@@ -221,22 +221,21 @@ resource "aws_lb_listener" "listener" {
   )
 
   default_action {
-    type = "forward"
-
     target_group_arn = lookup(
       var.listener_map[element(local.lm_keys, count.index)],
       "target_group",
       element(aws_lb_target_group.tg.*.arn, count.index),
     )
+    type = "forward"
   }
 }
 
 resource "aws_route53_record" "route53_record" {
   count = var.create_internal_zone_record ? 1 : 0
 
-  zone_id = var.route_53_hosted_zone_id
   name    = var.internal_record_name
   type    = "A"
+  zone_id = var.route_53_hosted_zone_id
 
   alias {
     evaluate_target_health = true
