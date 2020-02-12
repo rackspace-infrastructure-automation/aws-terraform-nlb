@@ -1,5 +1,13 @@
+terraform {
+  required_version = ">= 0.12"
+}
+
+provider "aws" {
+  version = "~> 2.20"
+}
+
 module "nlb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.6"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.12.0"
 
   enable_cloudwatch_alarm_actions = true
   environment                     = "Test"
@@ -42,3 +50,4 @@ module "nlb" {
 
   vpc_id = "vpc-xxxxxxxxxxxxxxxx"
 }
+

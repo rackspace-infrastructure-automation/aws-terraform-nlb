@@ -9,7 +9,7 @@
  *
  * ```HCL
  * module "nlb" {
- *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.0.6"
+ *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.12.0"
  *
  *   # enable alarm actions for TG alarms. vars available for these parameters
  *   enable_cloudwatch_alarm_actions = true
@@ -86,6 +86,14 @@
  *   - unhealthy_host_count_alarm
  */
 
+terraform {
+  required_version = ">= 0.12"
+
+  required_providers {
+    aws = ">= 2.20"
+  }
+}
+
 locals {
   default_health_check = {
     healthy_threshold   = 3
@@ -99,117 +107,170 @@ locals {
     target_type = "instance"
   }
 
-  hc_keys = "${keys(var.hc_map)}"
-  lm_keys = "${keys(var.listener_map)}"
-  tg_keys = "${keys(var.tg_map)}"
+  hc_keys = keys(var.hc_map)
+  lm_keys = keys(var.listener_map)
+  tg_keys = keys(var.tg_map)
 
-  tags = "${merge(
-     var.tags,
-     map(
-      "Environment", "${var.environment}",
-      "ServiceProvider", "Rackspace"
-    )
-  )}"
+  tags = merge(
+    var.tags,
+    {
+      "Environment"     = var.environment
+      "ServiceProvider" = "Rackspace"
+    },
+  )
 }
 
 resource "aws_lb" "nlb" {
-  name               = "${var.name}"
-  internal           = "${var.facing == "internal" ? true : false}"
+  name               = var.name
+  internal           = var.facing == "internal" ? true : false
   load_balancer_type = "network"
 
-  enable_cross_zone_load_balancing = "${var.cross_zone}"
+  enable_cross_zone_load_balancing = var.cross_zone
 
-  subnets = ["${var.subnet_ids}"]
+  subnets = var.subnet_ids
 
-  tags = "${local.tags}"
+  tags = local.tags
 }
 
 resource "aws_lb_target_group" "tg" {
-  count = "${length(local.tg_keys)}"
+  count = length(local.tg_keys)
 
-  vpc_id = "${var.vpc_id}"
+  vpc_id = var.vpc_id
 
-  name = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "name",
-                   "${var.name}-${element(local.tg_keys, count.index)}-tg")}"
+  name = lookup(
+    var.tg_map[element(local.tg_keys, count.index)],
+    "name",
+    "${var.name}-${element(local.tg_keys, count.index)}-tg",
+  )
 
-  port                 = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "port")}"
-  protocol             = "${upper(lookup(var.tg_map[element(local.tg_keys, count.index)], "protocol", "TCP"))}"
-  deregistration_delay = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "dereg_delay", "300")}"
-  target_type          = "${lookup(var.tg_map[element(local.tg_keys, count.index)], "target_type", "instance")}"
+  deregistration_delay = lookup(
+    var.tg_map[element(local.tg_keys, count.index)],
+    "dereg_delay",
+    "300",
+  )
+  port = var.tg_map[element(local.tg_keys, count.index)]["port"]
+  protocol = upper(
+    lookup(
+      var.tg_map[element(local.tg_keys, count.index)],
+      "protocol",
+      "TCP",
+    ),
+  )
+  target_type = lookup(
+    var.tg_map[element(local.tg_keys, count.index)],
+    "target_type",
+    "instance",
+  )
 
-  tags = "${local.tags}"
+  tags = local.tags
 
   health_check {
-    protocol            = "${upper(lookup(var.hc_map[element(local.hc_keys, count.index)], "protocol"))}"
-    healthy_threshold   = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "healthy_threshold", "3")}"
-    unhealthy_threshold = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "unhealthy_threshold", "3")}"
-    interval            = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "interval", "30")}"
-    matcher             = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "matcher", "")}"
-    path                = "${lookup(var.hc_map[element(local.hc_keys, count.index)], "path", "")}"
+    healthy_threshold = lookup(
+      var.hc_map[element(local.hc_keys, count.index)],
+      "healthy_threshold",
+      "3",
+    )
+    interval = lookup(
+      var.hc_map[element(local.hc_keys, count.index)],
+      "interval",
+      "30",
+    )
+    matcher = lookup(
+      var.hc_map[element(local.hc_keys, count.index)],
+      "matcher",
+      "",
+    )
+    path     = lookup(var.hc_map[element(local.hc_keys, count.index)], "path", "")
+    protocol = upper(var.hc_map[element(local.hc_keys, count.index)]["protocol"])
+    unhealthy_threshold = lookup(
+      var.hc_map[element(local.hc_keys, count.index)],
+      "unhealthy_threshold",
+      "3",
+    )
   }
 }
 
 resource "aws_lb_listener" "listener" {
-  count = "${var.listener_map_count}"
+  count = var.listener_map_count
 
-  certificate_arn   = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "certificate_arn", "")}"
-  load_balancer_arn = "${aws_lb.nlb.arn}"
-  port              = "${lookup(var.listener_map[element(local.lm_keys, count.index)], "port")}"
-  protocol          = "${upper(lookup(var.listener_map[element(local.lm_keys, count.index)], "protocol", "TCP"))}"
+  certificate_arn = lookup(
+    var.listener_map[element(local.lm_keys, count.index)],
+    "certificate_arn",
+    "",
+  )
+  load_balancer_arn = aws_lb.nlb.arn
+  port              = var.listener_map[element(local.lm_keys, count.index)]["port"]
+  protocol = upper(
+    lookup(
+      var.listener_map[element(local.lm_keys, count.index)],
+      "protocol",
+      "TCP",
+    ),
+  )
 
-  ssl_policy = "${upper(lookup(var.listener_map[element(local.lm_keys, count.index)], "protocol", "TCP")) != "TLS" ? "" :
-                  lookup(var.listener_map[element(local.lm_keys, count.index)], "ssl_policy",
-                         "ELBSecurityPolicy-TLS-1-2-2017-01")}"
+  ssl_policy = upper(
+    lookup(
+      var.listener_map[element(local.lm_keys, count.index)],
+      "protocol",
+      "TCP",
+    ),
+    ) != "TLS" ? "" : lookup(
+    var.listener_map[element(local.lm_keys, count.index)],
+    "ssl_policy",
+    "ELBSecurityPolicy-TLS-1-2-2017-01",
+  )
 
   default_action {
+    target_group_arn = lookup(
+      var.listener_map[element(local.lm_keys, count.index)],
+      "target_group",
+      element(aws_lb_target_group.tg.*.arn, count.index),
+    )
     type = "forward"
-
-    target_group_arn = "${lookup(var.listener_map[element(local.lm_keys, count.index)],
-                                 "target_group",
-                                 element(aws_lb_target_group.tg.*.arn, count.index))}"
   }
 }
 
 resource "aws_route53_record" "route53_record" {
-  count = "${var.create_internal_zone_record ? 1 : 0}"
+  count = var.create_internal_zone_record ? 1 : 0
 
-  zone_id = "${var.route_53_hosted_zone_id}"
-  name    = "${var.internal_record_name}"
+  name    = var.internal_record_name
   type    = "A"
+  zone_id = var.route_53_hosted_zone_id
 
   alias {
     evaluate_target_health = true
-    name                   = "${aws_lb.nlb.dns_name}"
-    zone_id                = "${aws_lb.nlb.zone_id}"
+    name                   = aws_lb.nlb.dns_name
+    zone_id                = aws_lb.nlb.zone_id
   }
 }
 
 data "null_data_source" "alarm_dimensions" {
-  count = "${length(local.tg_keys)}"
+  count = length(local.tg_keys)
 
   inputs = {
-    LoadBalancer = "${aws_lb.nlb.arn_suffix}"
-    TargetGroup  = "${aws_lb_target_group.tg.*.arn_suffix[count.index]}"
+    LoadBalancer = aws_lb.nlb.arn_suffix
+    TargetGroup  = aws_lb_target_group.tg[count.index].arn_suffix
   }
 }
 
 module "unhealthy_host_count_alarm" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.0.1"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.0"
 
-  alarm_count              = "${length(local.tg_keys)}"
+  alarm_count              = length(local.tg_keys)
   alarm_description        = "Unhealthy Host count is above threshold, creating ticket."
   alarm_name               = "NLB Unhealthy Host Count - ${aws_lb.nlb.name}"
   comparison_operator      = "GreaterThanOrEqualToThreshold"
-  dimensions               = "${data.null_data_source.alarm_dimensions.*.outputs}"
+  dimensions               = data.null_data_source.alarm_dimensions.*.outputs
   evaluation_periods       = 10
   metric_name              = "UnHealthyHostCount"
   namespace                = "AWS/NetworkELB"
-  notification_topic       = "${var.notification_topic}"
+  notification_topic       = var.notification_topic
   period                   = 60
-  rackspace_alarms_enabled = "${var.rackspace_alarms_enabled}"
-  rackspace_managed        = "${var.rackspace_managed}"
+  rackspace_alarms_enabled = var.rackspace_alarms_enabled
+  rackspace_managed        = var.rackspace_managed
   severity                 = "emergency"
   statistic                = "Maximum"
   threshold                = 1
   unit                     = "Count"
 }
+
