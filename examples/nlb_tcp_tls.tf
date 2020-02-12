@@ -3,7 +3,7 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 2.1"
+  version = "~> 2.20"
 }
 
 module "nlb" {

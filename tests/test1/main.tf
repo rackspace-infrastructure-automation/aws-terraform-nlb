@@ -97,7 +97,7 @@ resource "random_string" "rstring" {
 }
 
 module "vpc" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-vpc_basenetwork?ref=master"
 
   az_count            = 2
   cidr_range          = "10.0.0.0/16"
@@ -210,14 +210,14 @@ module "internal" {
 }
 
 module "security_groups" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-security_group?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-security_group?ref=master"
 
   name   = "ASGIR-${random_string.rstring.result}"
   vpc_id = module.vpc.vpc_id
 }
 
 module "asg" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-ec2_asg?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-ec2_asg?ref=master"
 
   additional_tags = data.null_data_source.asg_tags.*.outputs
   ec2_os          = "amazon2"
