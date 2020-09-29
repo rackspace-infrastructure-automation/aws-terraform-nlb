@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 module "nlb" {
-  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.12.0"
+  source = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git//?ref=v0.12.0"
 
   enable_cloudwatch_alarm_actions = true
   environment                     = "Test"

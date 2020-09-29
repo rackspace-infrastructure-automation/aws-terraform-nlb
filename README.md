@@ -8,7 +8,7 @@ This and other examples available [here](examples/)
 
 ```HCL
 module "nlb" {
-  source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.12.0"
+  source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git//?ref=v0.12.0"
 
   # enable alarm actions for TG alarms. vars available for these parameters
   enable_cloudwatch_alarm_actions = true
