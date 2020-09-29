@@ -9,7 +9,7 @@
  *
  * ```HCL
  * module "nlb" {
- *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git?ref=v0.12.0"
+ *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git//?ref=v0.12.0"
  *
  *   # enable alarm actions for TG alarms. vars available for these parameters
  *   enable_cloudwatch_alarm_actions = true
@@ -162,7 +162,10 @@ resource "aws_lb_target_group" "tg" {
     "instance",
   )
 
-  tags = local.tags
+  stickiness {
+    type    = "lb_cookie"
+    enabled = false
+  }
 
   health_check {
     healthy_threshold = lookup(
@@ -188,6 +191,8 @@ resource "aws_lb_target_group" "tg" {
       "3",
     )
   }
+
+  tags = local.tags
 }
 
 resource "aws_lb_listener" "listener" {
@@ -273,4 +278,3 @@ module "unhealthy_host_count_alarm" {
   threshold                = 1
   unit                     = "Count"
 }
-
