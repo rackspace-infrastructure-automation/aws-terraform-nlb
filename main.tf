@@ -9,7 +9,7 @@
  *
  * ```HCL
  * module "nlb" {
- *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git//?ref=v0.12.0"
+ *   source         = "git@github.com:rackspace-infrastructure-automation/aws-terraform-nlb.git//?ref=v0.12.2"
  *
  *   # enable alarm actions for TG alarms. vars available for these parameters
  *   enable_cloudwatch_alarm_actions = true
@@ -184,6 +184,7 @@ resource "aws_lb_target_group" "tg" {
       "",
     )
     path     = lookup(var.hc_map[element(local.hc_keys, count.index)], "path", "")
+    port     = lookup(var.hc_map[element(local.hc_keys, count.index)], "port", "traffic-port")
     protocol = upper(var.hc_map[element(local.hc_keys, count.index)]["protocol"])
     unhealthy_threshold = lookup(
       var.hc_map[element(local.hc_keys, count.index)],

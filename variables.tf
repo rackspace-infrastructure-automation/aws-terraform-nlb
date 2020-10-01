@@ -39,6 +39,7 @@ hc_map  = {
     }
   "listener2" = {
       protocol            = "HTTP"
+      port                = "80"
       healthy_threshold   = "3"
       unhealthy_threshold = "3"
       interval            = "30"
