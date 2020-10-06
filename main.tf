@@ -162,9 +162,17 @@ resource "aws_lb_target_group" "tg" {
     "instance",
   )
 
-  stickiness {
-    type    = "lb_cookie"
-    enabled = false
+  dynamic "stickiness" {
+    for_each = lookup(
+      var.tg_map[element(local.tg_keys, count.index)],
+      "stickiness_placeholder",
+      false,
+    ) ? toset(["build"]) : toset([])
+
+    content {
+      enabled = false
+      type    = "lb_cookie"
+    }
   }
 
   health_check {

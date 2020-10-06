@@ -83,6 +83,13 @@ module "nlb" {
 Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm) to create the following CloudWatch Alarms:
   - unhealthy\_host\_count\_alarm
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| aws | >= 2.20 |
+
 ## Providers
 
 | Name | Version |
@@ -93,7 +100,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the NLB. i.e true \| false | `bool` | `false` | no |
 | cross\_zone | configure cross zone load balancing | `bool` | `true` | no |
 | eni\_count | explicitly tell terraform how many subnets to expect | `number` | `0` | no |
@@ -109,7 +116,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | rackspace\_managed | Boolean parameter controlling if instance will be fully managed by Rackspace support teams, created CloudWatch alarms that generate tickets, and utilize Rackspace managed SSM documents. | `bool` | `true` | no |
 | route\_53\_hosted\_zone\_id | the zone\_id in which to create our ALIAS | `string` | `""` | no |
 | subnet\_ids | list of subnet ids (1 per AZ only) to attach to this NLB | `list(string)` | n/a | yes |
-| subnet\_map | **not implemented** subnet -> EIP mapping | `map(list(string))` | <pre>{<br>  "0": [<br>    "eip-1",<br>    "subnet-1"<br>  ]<br>}</pre> | no |
+| subnet\_map | \*\*not implemented\*\* subnet -> EIP mapping | `map(list(string))` | <pre>{<br>  "0": [<br>    "eip-1",<br>    "subnet-1"<br>  ]<br>}</pre> | no |
 | tags | tags map | `map(string)` | `{}` | no |
 | tg\_map | target group map | `map(map(string))` | n/a | yes |
 | vpc\_id | VPC ID | `string` | n/a | yes |

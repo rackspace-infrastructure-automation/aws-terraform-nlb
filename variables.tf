@@ -145,6 +145,8 @@ tg_map  = {
     "target_type"   = "instance"
   }
 }
+
+N.B. if you receive an error `Network Load Balancers do not support Stickiness` then try adding a key to your problem target groups of `stickiness_placeholder = true`
 */
 variable "tg_map" {
   description = "target group map"
