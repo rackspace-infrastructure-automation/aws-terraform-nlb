@@ -139,9 +139,10 @@ module "external" {
 
   tg_map = {
     listener1 = {
-      dereg_delay = 300
-      port        = 80
-      target_type = "instance"
+      dereg_delay            = 300
+      port                   = 80
+      target_type            = "instance"
+      stickiness_placeholder = true
     }
   }
 
@@ -200,9 +201,10 @@ module "internal" {
 
   tg_map = {
     listener1 = {
-      dereg_delay = 300
-      port        = 80
-      target_type = "instance"
+      dereg_delay            = 300
+      port                   = 80
+      target_type            = "instance"
+      stickiness_placeholder = true
     }
   }
 
@@ -233,4 +235,3 @@ module "asg" {
     module.internal.target_group_arns,
   )
 }
-
