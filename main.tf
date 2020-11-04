@@ -95,9 +95,9 @@ terraform {
 }
 
 locals {
-  acl_list = ["authenticated-read", "aws-exec-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write", "private", "public-read", "public-read-write"]
+  acl_list = ["authenticated-read", "aws-exec-read", "log-delivery-write", "private", "public-read", "public-read-write"]
 
-  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
+  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "private"
 
   default_health_check = {
     healthy_threshold   = 3
@@ -197,7 +197,7 @@ resource "aws_lb_target_group" "tg" {
 
     content {
       enabled = false
-      type    = "lb_cookie"
+      type    = "source_ip"
     }
   }
 
