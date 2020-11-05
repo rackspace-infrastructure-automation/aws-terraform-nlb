@@ -142,7 +142,7 @@ module "external" {
       dereg_delay            = 300
       port                   = 80
       target_type            = "instance"
-      stickiness_placeholder = true
+      stickiness_placeholder = false
     }
   }
 
@@ -151,7 +151,7 @@ module "external" {
 
 resource "random_string" "random_zone" {
   length  = 6
-  lower   = true
+  lower   = tru
   number  = false
   special = false
   upper   = false
