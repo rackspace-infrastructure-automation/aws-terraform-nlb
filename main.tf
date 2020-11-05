@@ -175,6 +175,8 @@ resource "aws_lb_target_group" "tg" {
     }
   }
 
+  foobar {}
+
   health_check {
     healthy_threshold = lookup(
       var.hc_map[element(local.hc_keys, count.index)],

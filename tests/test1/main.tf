@@ -151,7 +151,7 @@ module "external" {
 
 resource "random_string" "random_zone" {
   length  = 6
-  lower   = tru
+  lower   = true
   number  = false
   special = false
   upper   = false
