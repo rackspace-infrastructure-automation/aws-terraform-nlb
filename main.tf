@@ -1,5 +1,5 @@
 /**
- * # aws-terraform-nlbs
+ * # aws-terraform-nlb
  *
  * This module provides the functionality to deploy a Network Load Balancer complete with listeners and target groups.
  *
