@@ -4,6 +4,18 @@ variable "create_internal_zone_record" {
   default     = false
 }
 
+variable "create_logging_bucket" {
+  description = "Create a new S3 logging bucket. i.e. true | false"
+  type        = bool
+  default     = false
+}
+
+variable "enable_deletion_protection" {
+  description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false."
+  type        = bool
+  default     = false
+}
+
 variable "cross_zone" {
   description = "configure cross zone load balancing"
   type        = bool
@@ -53,6 +65,12 @@ variable "hc_map" {
   type        = map(map(string))
 }
 
+variable "kms_key_id" {
+  description = "The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse_algorithm as aws:kms."
+  type        = string
+  default     = ""
+}
+
 variable "internal_record_name" {
   description = "Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com"
   type        = string
@@ -81,6 +99,48 @@ variable "listener_map_count" {
   description = "The number of listener maps to utilize"
   type        = number
   default     = 1
+}
+
+variable "logging_bucket_acl" {
+  description = "Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl"
+  type        = string
+  default     = "bucket-owner-full-control"
+}
+
+variable "logging_bucket_encyption" {
+  description = "Enable default bucket encryption. i.e. AES256 | aws:kms"
+  type        = string
+  default     = "AES256"
+}
+
+variable "logging_bucket_force_destroy" {
+  description = "Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true | false"
+  type        = bool
+  default     = false
+}
+
+variable "logging_bucket_name" {
+  description = "The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name."
+  type        = string
+  default     = ""
+}
+
+variable "logging_bucket_prefix" {
+  description = "The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs'"
+  type        = string
+  default     = null
+}
+
+variable "logging_bucket_retention" {
+  description = "The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999"
+  type        = number
+  default     = 14
+}
+
+variable "logging_enabled" {
+  description = "Whether logging for this bucket is enabled."
+  type        = bool
+  default     = false
 }
 
 variable "name" {

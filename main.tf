@@ -95,6 +95,10 @@ terraform {
 }
 
 locals {
+  acl_list = ["authenticated-read", "aws-exec-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write", "private", "public-read", "public-read-write"]
+
+  bucket_acl = contains(local.acl_list, var.logging_bucket_acl) ? var.logging_bucket_acl : "bucket-owner-full-control"
+
   default_health_check = {
     healthy_threshold   = 3
     interval            = 30
@@ -118,6 +122,14 @@ locals {
       "ServiceProvider" = "Rackspace"
     },
   )
+
+  access_logs = [
+    {
+      bucket  = var.logging_bucket_name
+      enabled = var.logging_enabled
+      prefix  = var.logging_bucket_prefix
+    }
+  ]
 }
 
 resource "aws_lb" "nlb" {
@@ -125,11 +137,25 @@ resource "aws_lb" "nlb" {
   internal           = var.facing == "internal" ? true : false
   load_balancer_type = "network"
 
+  enable_deletion_protection       = var.enable_deletion_protection
   enable_cross_zone_load_balancing = var.cross_zone
 
-  subnets = var.subnet_ids
+  dynamic "access_logs" {
+    for_each = [for al in local.access_logs : al if al.enabled]
 
-  tags = local.tags
+    content {
+      bucket  = access_logs.value["bucket"]
+      enabled = access_logs.value["enabled"]
+      prefix  = access_logs.value["prefix"]
+    }
+  }
+
+  subnets = var.subnet_ids
+  tags    = local.tags
+
+  depends_on = [
+    aws_s3_bucket_policy.log_bucket_policy,
+  ]
 }
 
 resource "aws_lb_target_group" "tg" {
@@ -242,6 +268,66 @@ resource "aws_lb_listener" "listener" {
     )
     type = "forward"
   }
+}
+
+# create s3 bucket if needed
+resource "aws_s3_bucket" "log_bucket" {
+  count = var.create_logging_bucket ? 1 : 0
+
+  acl           = local.bucket_acl
+  bucket        = var.logging_bucket_name
+  force_destroy = var.logging_bucket_force_destroy
+  tags          = local.merged_tags
+
+  lifecycle_rule {
+    enabled = true
+    prefix  = var.logging_bucket_prefix
+
+    expiration {
+      days = var.logging_bucket_retention
+    }
+  }
+
+  lifecycle_rule {
+    abort_incomplete_multipart_upload_days = 7
+    enabled                                = true
+    id                                     = "rax-cleanup-incomplete-mpu-objects"
+
+    expiration {}
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = var.kms_key_id
+        sse_algorithm     = var.logging_bucket_encyption
+      }
+    }
+  }
+}
+
+# s3 policy needs to be separate since you can't reference the bucket for the reference.
+
+data "aws_iam_policy_document" "log_bucket_policy" {
+  count = var.create_logging_bucket ? 1 : 0
+
+  statement {
+    actions   = ["s3:PutObject"]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.log_bucket[0].arn}/*"]
+
+    principals {
+      identifiers = [data.aws_elb_service_account.main.arn]
+      type        = "AWS"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "log_bucket_policy" {
+  count = var.create_logging_bucket ? 1 : 0
+
+  bucket = aws_s3_bucket.log_bucket[0].id
+  policy = data.aws_iam_policy_document.log_bucket_policy[0].json
 }
 
 resource "aws_route53_record" "route53_record" {
