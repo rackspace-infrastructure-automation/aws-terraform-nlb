@@ -110,7 +110,8 @@ module "vpc" {
 module "external" {
   source = "../../module"
 
-  eni_count = 2
+  create_logging_bucket = true
+  eni_count             = 2
 
   hc_map = {
     listener1 = {
@@ -132,10 +133,13 @@ module "external" {
     }
   }
 
-  listener_map_count = 1
-  name               = "${random_string.rstring.result}-nlb-ext"
-  subnet_ids         = module.vpc.public_subnets
-  tags               = local.tags
+  listener_map_count           = 1
+  logging_bucket_force_destroy = true
+  logging_bucket_name          = "7893478934789789345678454-test-12342134"
+  logging_enabled              = true
+  name                         = "${random_string.rstring.result}-nlb-ext"
+  subnet_ids                   = module.vpc.public_subnets
+  tags                         = local.tags
 
   tg_map = {
     listener1 = {
