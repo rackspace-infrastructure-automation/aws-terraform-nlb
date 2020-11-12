@@ -96,8 +96,8 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 |------|-------------|------|---------|:-----:|
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the NLB. i.e true \| false | `bool` | `false` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `false` | no |
-| enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | `bool` | `false` | no |
 | cross\_zone | configure cross zone load balancing | `bool` | `true` | no |
+| enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | `bool` | `false` | no |
 | eni\_count | explicitly tell terraform how many subnets to expect | `number` | `0` | no |
 | environment | environment name e.g. dev; prod | `string` | `"test"` | no |
 | facing | is this load-balancer internal or external? | `string` | `"external"` | no |
@@ -133,6 +133,12 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | load\_balancer\_arn\_suffix | The ARN suffix for use with CloudWatch Metrics. |
 | load\_balancer\_id | the ID and ARN of the load balancer |
 | load\_balancer\_zone\_id | The canonical hosted zone ID of the load balancer (to be used in a Route 53 Alias record). |
+| logging\_bucket\_arn | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
+| logging\_bucket\_domain\_name | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
+| logging\_bucket\_hosted\_zone\_id | The Route 53 Hosted Zone ID for this bucket's region. |
+| logging\_bucket\_id | The name of the bucket. |
+| logging\_bucket\_region | The AWS region this bucket resides in. |
+| logging\_bucket\_regional\_domain\_name | The bucket region-specific domain name. The bucket domain name including the region name. |
 | target\_group\_arn\_suffixes | ARN suffixes of our target groups - can be used with CloudWatch. |
 | target\_group\_arns | ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target\_group\_names | Name of the target group. Useful for passing to your CodeDeploy Deployment Group |

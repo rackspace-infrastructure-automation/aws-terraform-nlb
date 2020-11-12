@@ -10,16 +10,16 @@ variable "create_logging_bucket" {
   default     = false
 }
 
-variable "enable_deletion_protection" {
-  description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false."
-  type        = bool
-  default     = false
-}
-
 variable "cross_zone" {
   description = "configure cross zone load balancing"
   type        = bool
   default     = true
+}
+
+variable "enable_deletion_protection" {
+  description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false."
+  type        = bool
+  default     = false
 }
 
 variable "eni_count" {
