@@ -132,6 +132,8 @@ locals {
   ]
 }
 
+data "aws_elb_service_account" "main" {}
+
 resource "aws_lb" "nlb" {
   name               = var.name
   internal           = var.facing == "internal" ? true : false
