@@ -279,7 +279,7 @@ resource "aws_s3_bucket" "log_bucket" {
   acl           = local.bucket_acl
   bucket        = var.logging_bucket_name
   force_destroy = var.logging_bucket_force_destroy
-  tags          = local.merged_tags
+  tags          = local.tags
 
   lifecycle_rule {
     enabled = true
