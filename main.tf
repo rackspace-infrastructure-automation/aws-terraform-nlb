@@ -132,8 +132,6 @@ locals {
   ]
 }
 
-data "aws_elb_service_account" "main" {}
-
 resource "aws_lb" "nlb" {
   name               = var.name
   internal           = var.facing == "internal" ? true : false
@@ -319,8 +317,25 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     resources = ["${aws_s3_bucket.log_bucket[0].arn}/*"]
 
     principals {
-      identifiers = [data.aws_elb_service_account.main.arn]
-      type        = "AWS"
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
+    actions   = ["s3:GetBucketAcl"]
+    effect    = "Allow"
+    resources = [aws_s3_bucket.log_bucket[0].arn]
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
     }
   }
 }

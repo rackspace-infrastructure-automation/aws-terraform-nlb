@@ -135,7 +135,7 @@ module "external" {
 
   listener_map_count           = 1
   logging_bucket_force_destroy = true
-  logging_bucket_name          = "7893478934789789345678454-test-12342134"
+  logging_bucket_name          = "${random_string.rstring.result}-nlb-logs"
   logging_enabled              = true
   name                         = "${random_string.rstring.result}-nlb-ext"
   subnet_ids                   = module.vpc.public_subnets
