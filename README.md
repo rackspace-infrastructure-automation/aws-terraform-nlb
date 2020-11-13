@@ -95,14 +95,24 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:-----:|
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the NLB. i.e true \| false | `bool` | `false` | no |
+| create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `false` | no |
 | cross\_zone | configure cross zone load balancing | `bool` | `true` | no |
+| enable\_deletion\_protection | If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer. Defaults to false. | `bool` | `false` | no |
 | eni\_count | explicitly tell terraform how many subnets to expect | `number` | `0` | no |
 | environment | environment name e.g. dev; prod | `string` | `"test"` | no |
 | facing | is this load-balancer internal or external? | `string` | `"external"` | no |
 | hc\_map | health check map | `map(map(string))` | n/a | yes |
 | internal\_record\_name | Record Name for the new Resource Record in the Internal Hosted Zone. i.e. nlb.example.com | `string` | `""` | no |
+| kms\_key\_id | The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of sse\_algorithm as aws:kms. | `string` | `""` | no |
 | listener\_map | listener map | `map(map(string))` | n/a | yes |
 | listener\_map\_count | The number of listener maps to utilize | `number` | `1` | no |
+| logging\_bucket\_acl | Define ACL for Bucket. Must be either authenticated-read, aws-exec-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write, private, public-read or public-read-write. Via https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl | `string` | `"bucket-owner-full-control"` | no |
+| logging\_bucket\_encyption | Enable default bucket encryption. i.e. AES256 \| aws:kms | `string` | `"AES256"` | no |
+| logging\_bucket\_force\_destroy | Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true \| false | `bool` | `false` | no |
+| logging\_bucket\_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | `string` | `""` | no |
+| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | n/a | yes |
+| logging\_bucket\_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | `number` | `14` | no |
+| logging\_enabled | Whether logging for this bucket is enabled. | `bool` | `false` | no |
 | name | name for this load balancer | `string` | n/a | yes |
 | notification\_topic | List of SNS Topic ARNs to use for customer notifications. | `list(string)` | `[]` | no |
 | rackspace\_alarms\_enabled | Specifies whether alarms will create a Rackspace ticket.  Ignored if rackspace\_managed is set to false. | `bool` | `false` | no |
@@ -123,6 +133,12 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | load\_balancer\_arn\_suffix | The ARN suffix for use with CloudWatch Metrics. |
 | load\_balancer\_id | the ID and ARN of the load balancer |
 | load\_balancer\_zone\_id | The canonical hosted zone ID of the load balancer (to be used in a Route 53 Alias record). |
+| logging\_bucket\_arn | The ARN of the bucket. Will be of format arn:aws:s3:::bucketname. |
+| logging\_bucket\_domain\_name | The bucket domain name. Will be of format bucketname.s3.amazonaws.com. |
+| logging\_bucket\_hosted\_zone\_id | The Route 53 Hosted Zone ID for this bucket's region. |
+| logging\_bucket\_id | The name of the bucket. |
+| logging\_bucket\_region | The AWS region this bucket resides in. |
+| logging\_bucket\_regional\_domain\_name | The bucket region-specific domain name. The bucket domain name including the region name. |
 | target\_group\_arn\_suffixes | ARN suffixes of our target groups - can be used with CloudWatch. |
 | target\_group\_arns | ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target\_group\_names | Name of the target group. Useful for passing to your CodeDeploy Deployment Group |
