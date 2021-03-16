@@ -161,10 +161,10 @@ resource "aws_lb" "nlb" {
   depends_on = [
     aws_s3_bucket_policy.log_bucket_policy,
   ]
-  //TODO: add conditional for var.facing?
+
   dynamic "subnet_mapping" {
     for_each = var.attach_eip_to_lb == true ? [for i in range(length(var.public_subnet_ids)) : {
-      subnet_id     = var.public_subnet_ids[i].id
+      subnet_id     = var.public_subnet_ids[i]
       allocation_id = aws_eip.lb[i].id
     }] : []
     content {
@@ -172,13 +172,11 @@ resource "aws_lb" "nlb" {
       allocation_id = subnet_mapping.value.allocation_id
     }
   }
-  //
   //  dynamic "subnet_mapping" {
-  //    for_each = var.public_subnet_ids
+  //    for_each = data.aws.subnet_ids.public_ids
   //    content {
   //      subnet_id     = subnet_mapping.value
-  ////      allocation_id = aws_eip.lb.id[subnet_mapping.key].allocation_id
-  //      subnet_map_test = var.
+  //      allocation_id = aws_eip.lb.id[subnet_mapping.key].allocation_id
   //    }
   //  }
 }
