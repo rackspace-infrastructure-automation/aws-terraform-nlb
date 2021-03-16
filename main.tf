@@ -132,6 +132,11 @@ locals {
   ]
 }
 
+resource "aws_eip" "lb" {
+  count = var.attach_eip_to_lb == true ? length(var.public_subnet_ids) : 0
+  vpc   = true
+}
+
 resource "aws_lb" "nlb" {
   name               = var.name
   internal           = var.facing == "internal" ? true : false
@@ -150,12 +155,32 @@ resource "aws_lb" "nlb" {
     }
   }
 
-  subnets = var.subnet_ids
+  subnets = var.attach_eip_to_lb == true ? var.subnet_ids : [""]
   tags    = local.tags
 
   depends_on = [
     aws_s3_bucket_policy.log_bucket_policy,
   ]
+  //TODO: add conditional for var.facing?
+  dynamic "subnet_mapping" {
+    for_each = var.attach_eip_to_lb == true ? [for i in range(length(var.public_subnet_ids)) : {
+      subnet_id     = var.public_subnet_ids[i].id
+      allocation_id = aws_eip.lb[i].id
+    }] : []
+    content {
+      subnet_id     = subnet_mapping.value.subnet_id
+      allocation_id = subnet_mapping.value.allocation_id
+    }
+  }
+  //
+  //  dynamic "subnet_mapping" {
+  //    for_each = var.public_subnet_ids
+  //    content {
+  //      subnet_id     = subnet_mapping.value
+  ////      allocation_id = aws_eip.lb.id[subnet_mapping.key].allocation_id
+  //      subnet_map_test = var.
+  //    }
+  //  }
 }
 
 resource "aws_lb_target_group" "tg" {

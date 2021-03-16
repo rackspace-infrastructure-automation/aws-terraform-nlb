@@ -177,6 +177,25 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
+variable "public_subnet_ids" {
+  description = "list of subnet ids (1 per AZ only) to attach to this NLB"
+  type        = list(string)
+}
+
+variable "subnet_map_test" {
+  description = "subnet -> EIP mapping"
+  type        = map(list(string))
+
+  default = {
+    "0" = ["eip-1", "subnet-1"]
+  }
+}
+
+variable "attach_eip_to_lb" {
+  description = "Whether eip should be attached to lb"
+  type        = bool
+}
+
 variable "subnet_map" {
   description = "**not implemented** subnet -> EIP mapping"
   type        = map(list(string))
