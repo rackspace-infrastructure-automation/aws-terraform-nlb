@@ -83,6 +83,13 @@ module "nlb" {
 Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm) to create the following CloudWatch Alarms:
   - unhealthy\_host\_count\_alarm
 
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| aws | >= 2.20 |
+
 ## Providers
 
 | Name | Version |
@@ -90,10 +97,33 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | aws | >= 2.20 |
 | null | n/a |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| unhealthy_host_count_alarm | git@github.com:rackspace-infrastructure-automation/aws-terraform-cloudwatch_alarm//?ref=v0.12.6 |  |
+
+## Resources
+
+| Name |
+|------|
+| [aws_caller_identity](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/data-sources/caller_identity) |
+| [aws_elb_service_account](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/data-sources/elb_service_account) |
+| [aws_iam_policy_document](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/data-sources/iam_policy_document) |
+| [aws_lb](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/resources/lb) |
+| [aws_lb_listener](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/resources/lb_listener) |
+| [aws_lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/resources/lb_target_group) |
+| [aws_network_interface](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/data-sources/network_interface) |
+| [aws_region](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/data-sources/region) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/resources/route53_record) |
+| [aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/resources/s3_bucket) |
+| [aws_s3_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/2.20/docs/resources/s3_bucket_policy) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:-----:|
+|------|-------------|------|---------|:--------:|
 | create\_internal\_zone\_record | Create Route 53 internal zone record for the NLB. i.e true \| false | `bool` | `false` | no |
 | create\_logging\_bucket | Create a new S3 logging bucket. i.e. true \| false | `bool` | `false` | no |
 | cross\_zone | configure cross zone load balancing | `bool` | `true` | no |
@@ -110,7 +140,7 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | logging\_bucket\_encyption | Enable default bucket encryption. i.e. AES256 \| aws:kms | `string` | `"AES256"` | no |
 | logging\_bucket\_force\_destroy | Whether all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. ie. true \| false | `bool` | `false` | no |
 | logging\_bucket\_name | The name of the S3 bucket for the access logs. The bucket name can contain only lowercase letters, numbers, periods (.), and dashes (-). If creating a new logging bucket enter desired bucket name. | `string` | `""` | no |
-| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | n/a | yes |
+| logging\_bucket\_prefix | The prefix for the location in the S3 bucket. If you don't specify a prefix, the access logs are stored in the root of the bucket. Entry must not start with a / or end with one. i.e. 'logs' or 'data/logs' | `string` | `null` | no |
 | logging\_bucket\_retention | The number of days to retain load balancer logs.  Parameter is ignored if not creating a new S3 bucket. i.e. between 1 - 999 | `number` | `14` | no |
 | logging\_enabled | Whether logging for this bucket is enabled. | `bool` | `false` | no |
 | name | name for this load balancer | `string` | n/a | yes |
@@ -142,4 +172,3 @@ Using [aws-terraform-cloudwatch\_alarm](https://github.com/rackspace-infrastruct
 | target\_group\_arn\_suffixes | ARN suffixes of our target groups - can be used with CloudWatch. |
 | target\_group\_arns | ARNs of the target groups. Useful for passing to your Auto Scaling group. |
 | target\_group\_names | Name of the target group. Useful for passing to your CodeDeploy Deployment Group |
-
